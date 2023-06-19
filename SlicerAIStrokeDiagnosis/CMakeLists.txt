@@ -5,10 +5,9 @@ project(SlicerAIStrokeDiagnosis)
 #-----------------------------------------------------------------------------
 # Extension meta-information
 set(EXTENSION_HOMEPAGE "https://www.slicer.org/wiki/Documentation/Nightly/Extensions/SlicerAIStrokeDiagnosis")
-set(EXTENSION_CATEGORY "SjsuAIStrokeDiagnosis")
+set(EXTENSION_CATEGORY "SjsuAIStroke")
 set(EXTENSION_CONTRIBUTORS "James Guzman (SJSU MS AI, Medical Imaging), Dr. Magdalini Eirinaki (SJSU MS AI Director & Project Advisor)")
-set(EXTENSION_DESCRIPTION "This an AI Stroke Diagnosis extension using SuperBuild to build a project comprised of multiple modules that doctors and radiologists can leverage to load stroke data, display stroke data dasbhoard analytics, display stroke lesion segmentation and display stroke medical image captioning.
-")
+set(EXTENSION_DESCRIPTION "This an AI Stroke Diagnosis extension using SuperBuild to build a project comprised of multiple modules that doctors and radiologists can leverage to load stroke data, display stroke data dasbhoard analytics, display stroke lesion segmentation and display stroke medical image captioning.")
 set(EXTENSION_ICONURL "https://www.example.com/Slicer/Extensions/SlicerAIStrokeDiagnosis.png")
 set(EXTENSION_SCREENSHOTURLS "https://www.example.com/Slicer/Extensions/SlicerAIStrokeDiagnosis/Screenshots/1.png")
 set(EXTENSION_DEPENDS "NA") # Specified as a list or "NA" if no dependencies
@@ -36,8 +35,9 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
-add_subdirectory(LoadDataPyZmq)
-add_subdirectory(LoadDataZmq)
+add_subdirectory(GenerateStrokeDataPy)
+add_subdirectory(VisualizeStrokeAnalyticsPy)
+add_subdirectory(DiagnoseStrokePy)
 ## NEXT_MODULE
 
 #-----------------------------------------------------------------------------
