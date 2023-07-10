@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message zmqMedicalImageMessage {
+    string device_name = 1;
+    bytes image_data = 2;
+    // Add other fields as needed
+}

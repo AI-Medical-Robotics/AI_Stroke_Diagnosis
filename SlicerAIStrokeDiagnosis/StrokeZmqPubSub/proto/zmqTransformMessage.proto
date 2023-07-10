@@ -1,0 +1,6 @@
+syntax "proto3";
+
+message zmqTransformMessage {
+    string device_name = 1;
+    repeated float transform_matrix = 2;
+}
