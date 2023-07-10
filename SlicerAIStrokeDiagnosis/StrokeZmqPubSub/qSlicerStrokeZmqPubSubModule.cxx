@@ -21,12 +21,23 @@
 // Qt includes
 #include <QTimer>
 
-// StrokeZmqPubSub Logic includes
-#include <vtkSlicerStrokeZmqPubSubLogic.h>
+// Slicer base includes
+#include "vtkSlicerVersionConfigure.h"
+#include <qSlicerCoreApplication.h>
+#include <qSlicerCoreIOManager.h>
+#include <qSlicerNodeWriter.h>
 
-// StrokeZmqPubSub includes
+// TODO (jg): check if there is zmq factory
+#include <zmqObjectFactoryBase.h>
+
+// TODO (jg): StrokeZmqPubSub includes
 #include "qSlicerStrokeZmqPubSubModule.h"
 #include "qSlicerStrokeZmqPubSubModuleWidget.h"
+#include "qSlicerTextFileReader.h"
+
+// TODO (jg): StrokeZmqPubSub Logic includes
+#include <vtkSlicerStrokeZmqPubSubLogic.h>
+
 
 // StrokeZmqPubSub MRML includes
 #include "vtkMRMLZmqConnectorNode.h"
@@ -89,7 +100,7 @@ QString qSlicerStrokeZmqPubSubModule::helpText() const
 //-----------------------------------------------------------------------------
 QString qSlicerStrokeZmqPubSubModule::acknowledgementText() const
 {
-  return "This module was developed by James Guzman (SJSU MS AI, Medical Imaging)";
+  return "This module was supported by SJSU Computer Engineering Department";
 }
 
 //-----------------------------------------------------------------------------
@@ -151,10 +162,10 @@ void qSlicerStrokeZmqPubSubModule::setMRMLScene(vtkMRMLScene* scene)
   }
 
   // Need to listen for any new zmq connector nodes being added to start/stop timer
-  this->qvtkConnect(oldScene, vtkMRMLScene::NodeAddedEvent,
+  this->qvtkReconnect(oldScene, scene, vtkMRMLScene::NodeAddedEvent,
                     this, SLOT(onNodeAddedEvent(vtkObject*, vtkObject*)));
 
-  this->qvtkConnect(oldScene, vtkMRMLScene::NodeRemovedEvent,
+  this->qvtkReconnect(oldScene, scene, vtkMRMLScene::NodeRemovedEvent,
                     this, SLOT(onNodeRemovedEvent(vtkObject*, vtkObject*)));
 }
 
