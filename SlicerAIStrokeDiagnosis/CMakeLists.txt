@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.16.3...3.19.7 FATAL_ERROR)
 
 project(SlicerAIStrokeDiagnosis)
 
+set(CMAKE_CXX_STANDARD 17)
+
+#-----------------------------------------------------------------------------
+# Conan setup
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+include_directories(${CMAKE_BINARY_DIR})
+
 #-----------------------------------------------------------------------------
 # Extension meta-information
 set(EXTENSION_HOMEPAGE "https://www.slicer.org/wiki/Documentation/Nightly/Extensions/SlicerAIStrokeDiagnosis")
@@ -35,9 +43,11 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
-add_subdirectory(GenerateStrokeDataPy)
-add_subdirectory(VisualizeStrokeAnalyticsPy)
-add_subdirectory(DiagnoseStrokePy)
+# add_subdirectory(GenerateStrokeDataPy)
+# add_subdirectory(VisualizeStrokeAnalyticsPy)
+# add_subdirectory(DiagnoseStrokePy)
+# add_subdirectory(StrokeZmqPubSubPy)
+add_subdirectory(StrokeZmqPubSub)
 ## NEXT_MODULE
 
 #-----------------------------------------------------------------------------
