@@ -2,6 +2,21 @@
 
 SJSU Master Thesis on AI Medical Imaging for Stroke Diagnosis
 
+For building 3D slicer, here are the commands:
+
+~~~bash
+cd ~/src
+git clone https://github.com/Slicer/Slicer.git --recursive
+pushd Slicer
+git checkout v5.2.2
+popd
+mkdir Slicer522-SuperBuild-debug
+~/src/open_source/Slicer522-SuperBuild-debug
+
+# Note: 3D Slicer may complain about QT5 not being found, so install it first
+
+~~~
+
 Here is my plan:
 
 - Client - Publisher: Simulate Stroke MRI Scanner in Unity where we load the MRI images while running the scanner simulator and then send those images over Zmq using C# Zmq Publisher.
