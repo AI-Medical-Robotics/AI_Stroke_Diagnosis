@@ -30,9 +30,16 @@ class VtkConan(ConanFile):
 
     def source(self):
         self.run("git clone --recursive -b v9.2.6 git@github.com:Kitware/VTK.git")
-    
+
     def build(self):
         cmake = CMake(self)
+        cmake.definitions["VTK_BUILD_EXAMPLES"] = "ON"
+        cmake.definitions["VTK_QT_VERSION:STRING"] = "5"
+        cmake.definitions["VTK_Group_Qt:BOOL"] = "ON"
+        cmake.definitions["QT_QMAKE_EXECUTABLE:PATH"] = os.path.join(os.path.expanduser("~"), "/Qt5.12.12/5.12.12/gcc_64/bin/qmake")
+        cmake.definitions["CMAKE_PREFIX_PATH:PATH"] = os.path.join(os.path.expanduser("~"), "/Qt5.12.12/5.12.12/gcc_64/lib/cmake")
+        cmake.definitions["VTK_GROUP_ENABLE_Qt-STRINGS"] = "YES"
+        cmake.definitions["VTK_MODULE_ENABLE_VTK_GUISupportQt"] = "YES"
         cmake.configure(source_folder=self.source_subdir, build_folder=self.build_subdir)
         cmake.build()
         cmake.install()
