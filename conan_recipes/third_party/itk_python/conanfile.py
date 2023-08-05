@@ -3,17 +3,13 @@ import os, subprocess, shutil
 from glob import glob
 import sys
 
-# Build VTK
-#   - Release mode doesnt work on Bizon AI computer
-#   - Debug mode works on Bizon AI computer
-
-class VtkConan(ConanFile):
-    name = "sjsu_vtk"
-    version = "9.2.6"
+class ItkConan(ConanFile):
+    name = "sjsu_itk"
+    version = "5.3.0"
     requires = "gtest/1.11.0"
-    license = "BSD-3-Clause"
-    url = "https://vtk.org/"
-    description = "VTK: Process images and create 3D computer graphics with the Visualization Toolkit."
+    license = "Apache 2.0 License"
+    url = "https://github.com/InsightSoftwareConsortium/ITKPythonPackage"
+    description = "A setup script to generate ITK Python Wheels"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "cmake_find_package"
     options = {
@@ -26,24 +22,19 @@ class VtkConan(ConanFile):
     }
     short_paths = True
 
-    source_subdir = "VTK"
+    source_subdir = "ITK"
     build_subdir = "build"
 
     def source(self):
-        self.run("git clone --recursive -b v9.2.6 git@github.com:Kitware/VTK.git")
+        self.run("git clone --depth 1 -b v5.3.0 git@github.com:InsightSoftwareConsortium/ITK.git")
 
     def build(self):
         cmake = CMake(self)
-        cmake.definitions["VTK_BUILD_EXAMPLES"] = "ON"
-        cmake.definitions["VTK_WRAP_PYTHON"] = "ON"
-        cmake.definitions["VTK_WHEEL_BUILD"] = "ON"
+        cmake.definitions["ITK_BUILD_ALL_MODULES"] = "ON"
+        cmake.definitions["ITK_WRAP_PYTHON:BOOL"] = "ON"
         cmake.definitions["PYTHON_EXECUTABLE"] = "{}".format(sys.executable)
-        cmake.definitions["VTK_QT_VERSION:STRING"] = "5"
-        cmake.definitions["VTK_Group_Qt:BOOL"] = "ON"
-        cmake.definitions["QT_QMAKE_EXECUTABLE:PATH"] = os.path.join(os.path.expanduser("~"), "/Qt5.12.12/5.12.12/gcc_64/bin/qmake")
-        cmake.definitions["CMAKE_PREFIX_PATH:PATH"] = os.path.join(os.path.expanduser("~"), "/Qt5.12.12/5.12.12/gcc_64/lib/cmake")
-        cmake.definitions["VTK_GROUP_ENABLE_Qt-STRINGS"] = "YES"
-        cmake.definitions["VTK_MODULE_ENABLE_VTK_GUISupportQt"] = "YES"
+        cmake.definitions["BUILD_TESTING"] = "ON"
+        cmake.definitions["DISABLE_MODULE_TESTS"] = "OFF"
         cmake.configure(source_folder=self.source_subdir, build_folder=self.build_subdir)
         cmake.build()
         cmake.install()

@@ -6,7 +6,6 @@ include(${CMAKE_BINARY_DIR}/generators/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
 find_package(VTK REQUIRED)
-# include(${VTK_USE_FILE})
 
 set(SRCS
     src/test_vtk.cpp
@@ -14,9 +13,16 @@ set(SRCS
 
 add_executable(${PROJECT_NAME} ${SRCS})
 
+# message("CONAN_LIB_DIRS_VTK = ${CONAN_LIB_DIRS_VTK}")
+# message("CONAN_LIBS_VTK = ${CONAN_LIBS_VTK}")
 message("VTK_LIBRARIES = ${VTK_LIBRARIES}")
+# target_link_directories(${PROJECT_NAME} PUBLIC
+#     ${CONAN_LIB_DIRS_VTK}
+# )
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
     CONAN_PKG::gtest
+    # ${CONAN_LIBS_VTK}
     ${VTK_LIBRARIES}
 )
 
@@ -31,3 +37,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 include(GoogleTest)
 gtest_discover_tests(${PROJECT_NAME})
+
+# Add Python test script
+# MESSAGE("PYTHON_EXECUTABLE = ${PYTHON_EXECUTABLE}")
+# add_test(NAME vtk_pytest
+#          COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/pytest_vtk.py)
