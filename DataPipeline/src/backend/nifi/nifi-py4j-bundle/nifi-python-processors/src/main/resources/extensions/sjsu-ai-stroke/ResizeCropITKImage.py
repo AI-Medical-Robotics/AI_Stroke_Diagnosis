@@ -15,7 +15,6 @@
 
 import io
 import os
-# import itk
 import SimpleITK as sitk
 import pandas as pd
 from tqdm import tqdm
@@ -23,7 +22,7 @@ from nifiapi.properties import PropertyDescriptor
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 from py4j.java_collections import ListConverter
 
-# TODO (JG): Update to use SimpleITK like we did for Bias Field Correction
+# TODO (JG): Resize and Crop SimpleITK not working as expected like nilearn resample_img(), testing
 
 # TODO (JG): Make this work for training and testing sets
 class ResizeCropITKImage(FlowFileTransform):
@@ -64,7 +63,7 @@ class ResizeCropITKImage(FlowFileTransform):
         return {"true": True, "false": False}.get(string_input.lower())
 
     def onScheduled(self, context):
-        self.logger.info("Getting properties for bias_corrected_dirpath, etc")
+        self.logger.info("Getting properties for rescrop_dirpath, etc")
         self.raw_index = list()
         self.mask_index = list()
         # read pre-trained model and config file
@@ -79,7 +78,7 @@ class ResizeCropITKImage(FlowFileTransform):
             os.makedirs(prep_dir)
         return prep_dir
 
-    def sitk_resample_crop(self, input_image, new_affine, target_shape, new_resolution, is_binary_mask=False):
+    def sitk_resample_crop(self, input_image, new_affine, target_shape, new_resolution):
         # Resample and crop the image uisng ITK
         resampler = sitk.ResampleImageFilter()
         resampler.SetReferenceImage(input_image)
@@ -87,8 +86,8 @@ class ResizeCropITKImage(FlowFileTransform):
         resampler.SetSize(target_shape)
         resampler.SetOutputOrigin(sitk.VectorDouble(new_affine.GetTranslation()))
         resampler.SetOutputDirection(new_affine.GetMatrix())
-        if is_binary_mask:
-            resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+        # if is_binary_mask:
+        resampler.SetInterpolator(sitk.sitkNearestNeighbor)
         resampler.SetTransform(new_affine)
         resampled_image = resampler.Execute(input_image)
         return resampled_image
@@ -102,8 +101,6 @@ class ResizeCropITKImage(FlowFileTransform):
         if self.already_rescropped:
             self.logger.info("Adding Prepped SimpleITK Resized & Cropped filepaths to data df in raw_index & mask_index")
 
-            # TODO (JG): This code is specific to nfbs, we'll need to adjust it for our 3 possibilities
-
             for i in tqdm(range(len(nifti_csv_data))):
                 self.raw_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_" + "raw" + str(i) + ".nii.gz")
                 
@@ -112,7 +109,10 @@ class ResizeCropITKImage(FlowFileTransform):
             self.logger.info("Retrieved Prepped Resized & Cropped voxel filepaths stored at : {}/".format(resized_cropped_dir))
         else:
             # TODO (JG): Could Add NiFi Properties to set these parameters
-            target_shape = [96, 128, 160]
+            # target_shape = [96, 128, 128]
+            target_shape = [128, 128, 96]
+            # Based on incoming corrected bias image
+            # target_shape = [64, 85, 85]
             new_resolution = [2.0, 2.0, 2.0]
 
             # Create a new affine matrix for resizing and cropping
@@ -147,16 +147,15 @@ class ResizeCropITKImage(FlowFileTransform):
                 output_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_" + "mask" + str(i) + ".nii.gz")
 
                 # Resample and crop the image using SimpleITK
-                resampled_mask = self.sitk_resample_crop(input_mask, new_affine, target_shape, new_resolution, is_binary_mask=True)
+                resampled_mask = self.sitk_resample_crop(input_mask, new_affine, target_shape, new_resolution)
 
                 # Write the resampled and cropped mask using ITK
                 sitk.WriteImage(resampled_mask, output_mask_path)
                 self.mask_index.append(output_mask_path)
+            self.logger.info("ITK Resized & Cropped voxels stored at: {}/".format(resized_cropped_dir))
 
         nifti_csv_data["raw_index"] = self.raw_index
         nifti_csv_data["mask_index"] = self.mask_index
-
-        self.logger.info("ITK Resized & Cropped voxels stored at: {}/".format(resized_cropped_dir))
 
         return nifti_csv_data
 

@@ -23,6 +23,8 @@ from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 
 # Verified we can run SimpleITK N4 Bias Field Correction and produces expected results faster than nipype's version
 
+# TODO (JG): Limitation in flow is flow file not passed to next processor until processor finishes work. This is with each processor like this
+
 # TODO (JG): Make this work for training and testing sets
 class CorrectBiasFieldInITKImage(FlowFileTransform):
     class Java:
@@ -101,11 +103,12 @@ class CorrectBiasFieldInITKImage(FlowFileTransform):
 
                 # Set shrink factor to 3
                 # https://simpleitk.readthedocs.io/en/master/link_N4BiasFieldCorrection_docs.html
-                shrinkFactor = 3
-                if shrinkFactor > 1:
-                    image = sitk.Shrink(
-                        input_image, [shrinkFactor] * input_image.GetDimension()
-                    )
+                self.logger.info("input_image.GetDimension() = {}".format(input_image.GetDimension()))
+
+                shrink_filter = sitk.ShrinkImageFilter()
+                shrink_filter.SetShrinkFactor(2)
+
+                shrunk_image = shrink_filter.Execute(input_image)
 
                 # Perform N4 bias field correction
                 self.logger.info("Create SimpleITK N4 Bias Field Correction Filter")
@@ -115,7 +118,7 @@ class CorrectBiasFieldInITKImage(FlowFileTransform):
                 corrector.SetMaximumNumberOfIterations([20, 10, 10, 5])
 
                 self.logger.info("Execute SimpleITK N4 Bias Field Correction")
-                corrected_image = corrector.Execute(image)
+                corrected_image = corrector.Execute(shrunk_image)
 
                 self.logger.info("Getting corrected_image type = {}".format(type(corrected_image)))
 

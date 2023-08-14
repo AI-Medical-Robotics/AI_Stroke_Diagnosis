@@ -53,7 +53,7 @@ class SaveITKImageSlice(FlowFileTransform):
         )
         self.nifti_csv_col = PropertyDescriptor(
             name = 'NifTI CSV Column Name',
-            description = 'The name of the NifTI Data Prep section you want to see an image slice from. Examples: get_nifti, correct_bias, resize_crop, etc',
+            description = 'The name of the NifTI Data Prep section you want to see an image slice from. Examples: get_nifti, correct_bias, resize_crop, intens_norm, etc',
             default_value = 'get_nifti',
             required = True
         )
@@ -101,8 +101,10 @@ class SaveITKImageSlice(FlowFileTransform):
         elif self.nifti_csv_col_name == "resize_crop":
             nifti_voxel = itk.imread(nifti_csv.raw_index.iloc[self.nifti_voxel_index], itk.F)
             nifti_voxel_mask = itk.imread(nifti_csv.mask_index.iloc[self.nifti_voxel_index], itk.UC)
+        elif self.nifti_csv_col_name == "intens_norm":
+            nifti_voxel = itk.imread(nifti_csv.intens_norm.iloc[self.nifti_voxel_index], itk.F)
 
-        if self.nifti_csv_col_name == "get_nifti" or self.nifti_csv_col_name == "correct_bias":
+        if self.nifti_csv_col_name == "get_nifti" or self.nifti_csv_col_name == "correct_bias" or self.nifti_csv_col_name == "intens_norm":
             # Convert ITK image to NumPy array for matplotlib visualization
             nifti_voxel_array = itk.GetArrayViewFromImage(nifti_voxel)
 
@@ -110,7 +112,7 @@ class SaveITKImageSlice(FlowFileTransform):
             fig, ax = plt.subplots(1, 1)
             ax.set_title("NifTI 2D Image Slice = {}".format(nifti_voxel_array.shape))
             # Would Display the 2D image slice, but in headless mode
-            ax.imshow(nifti_voxel_array[nifti_voxel_array.shape[0]//self.nifti_image_divisor], cmap='gray')
+            ax.imshow(nifti_voxel_array[nifti_voxel_array.shape[0]//self.nifti_image_divisor])
 
             # Save the 2D image slice as file
             saved_itk_image_dir = self.mkdir_prep_dir(self.saved_img_dirpath)
@@ -123,12 +125,12 @@ class SaveITKImageSlice(FlowFileTransform):
             nifti_voxel_mask_array = itk.GetArrayViewFromImage(nifti_voxel_mask)
 
             # Create a figure and axis for visualization
-            fig, ax = plt.subplots(1, 2)
+            fig, ax = plt.subplots(1, 2, figsize=(14, 10))
             ax[0].set_title("NifTI {} 2D Image Slice = {}".format(self.nifti_data_name, nifti_voxel_array.shape))
             # Display the 2D image slice
             ax[0].imshow(nifti_voxel_array[nifti_voxel_array.shape[0]//self.nifti_image_divisor])
 
-            ax[1].set_title("NifTI {} 2D Image Slice = {}".format(self.nifti_data_name, nifti_voxel_array.shape))
+            ax[1].set_title("NifTI {} 2D Image Mask Slice = {}".format(self.nifti_data_name, nifti_voxel_array.shape))
             ax[1].imshow(nifti_voxel_mask_array[nifti_voxel_mask_array.shape[0]//self.nifti_image_divisor])
 
             # Save the 2D image slice as file
