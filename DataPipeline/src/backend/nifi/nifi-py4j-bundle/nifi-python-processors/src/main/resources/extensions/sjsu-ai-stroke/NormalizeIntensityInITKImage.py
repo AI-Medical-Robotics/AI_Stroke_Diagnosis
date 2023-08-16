@@ -62,7 +62,7 @@ class NormalizeIntensityInITKImage(FlowFileTransform):
 
     def onScheduled(self, context):
         self.logger.info("Getting properties for intensity_norm_dirpath, etc")
-        self.intens_norm = list()
+        self.intensity_norm = list()
         # read pre-trained model and config file
         self.intensity_norm_dirpath = context.getProperty(self.intensity_norm_dir.name).getValue()
         self.already_intens_normed = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
@@ -79,40 +79,40 @@ class NormalizeIntensityInITKImage(FlowFileTransform):
         # Resample and crop the image uisng ITK
         resacle_filter = sitk.RescaleIntensityImageFilter()
         resacle_filter.SetOutputMaximum(max)
-        resacle_filter.SetOuptutMinimum(min)
+        resacle_filter.SetOutputMinimum(min)
         normalized_image = resacle_filter.Execute(input_image)
         return normalized_image
 
     def itk_intensity_normalized(self, nifti_csv_data):
         self.logger.info("Performing SimpleITK Intensity Normalization")
-        intense_norm_dir = self.mkdir_prep_dir(self.intensity_norm_dirpath)
+        intensity_norm_dir = self.mkdir_prep_dir(self.intensity_norm_dirpath)
 
         # In NiFi Python Processor, add property for this
         self.logger.info("self.already_intens_normed type = {}".format(type(self.already_intens_normed)))
         if self.already_intens_normed:
-            self.logger.info("Adding Prepped SimpleITK Intensity Normalized filepaths to data df intens_norm")
+            self.logger.info("Adding Prepped SimpleITK Intensity Normalized filepaths to data df intensity_norm")
 
             # TODO (JG): This code is specific to nfbs, we'll need to adjust it for our 3 possibilities
 
             for i in tqdm(range(len(nifti_csv_data))):
-                self.intens_norm.append(self.intensity_norm_dirpath + os.sep + self.nifti_data_name + "_" + "intens_norm_" + str(i) + ".nii.gz")
+                self.intensity_norm.append(self.intensity_norm_dirpath + os.sep + self.nifti_data_name + "_" + "intensity_norm_" + str(i) + ".nii.gz")
 
             self.logger.info("Retrieved Prepped Intensity Normalized voxel filepaths stored at : {}/".format(self.intensity_norm_dirpath))
         else:
             for i in tqdm(range(len(nifti_csv_data))):
                 # Load the Raw Resized & Cropped image using ITK
                 input_resize_cropped_img = sitk.ReadImage(nifti_csv_data.raw_index.iloc[i])
-                output_image_path = os.path.join(self.intensity_norm_dirpath + os.sep + self.nifti_data_name + "_" + "intens_norm_" + str(i) + ".nii.gz")
+                output_image_path = os.path.join(self.intensity_norm_dirpath + os.sep + self.nifti_data_name + "_" + "intensity_norm_" + str(i) + ".nii.gz")
 
                 # Resample and crop the image using SimpleITK
                 intensity_normalized_image = self.sitk_intensity_normalized(input_resize_cropped_img, max=255, min=0)
 
                 # Write the resampled and cropped image using ITK
                 sitk.WriteImage(intensity_normalized_image, output_image_path)
-                self.intens_norm.append(output_image_path)
+                self.intensity_norm.append(output_image_path)
             self.logger.info("ITK Intensity Normalized voxels stored at: {}/".format(self.intensity_norm_dirpath))
 
-        nifti_csv_data["intens_norm"] = self.intens_norm
+        nifti_csv_data["intensity_norm"] = self.intensity_norm
 
         return nifti_csv_data
 
