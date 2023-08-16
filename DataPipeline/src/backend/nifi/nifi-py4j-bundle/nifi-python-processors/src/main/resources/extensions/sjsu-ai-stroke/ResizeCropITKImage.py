@@ -15,6 +15,7 @@
 
 import io
 import os
+import json
 import SimpleITK as sitk
 import pandas as pd
 from tqdm import tqdm
@@ -54,7 +55,20 @@ class ResizeCropITKImage(FlowFileTransform):
             default_value = "nfbs",
             required=True
         )
-        self.descriptors = [self.rescrop_dir, self.already_prepped, self.nifti_data_type]
+        self.spacing_resolution = PropertyDescriptor(
+            name = 'Resize Spacing Resolution',
+            description = 'Control the spacing resolution for NIfTI voxels to resize to be large (< 2) or small (> 2)',
+            default_value = "1.0",
+            required=True
+        )
+        self.dimensions = PropertyDescriptor(
+            name = 'Resize Crop Target Dimensions',
+            description = 'Set the resize crop target dimensions {width, height, depth} for NIfTI voxels',
+            default_value = """{"width": 128, "height": 128, "depth": 96}""",
+            required=True
+        )
+        self.expected_dim_keys = ['width', 'height', 'depth']
+        self.descriptors = [self.rescrop_dir, self.already_prepped, self.nifti_data_type, self.spacing_resolution, self.dimensions]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -70,6 +84,8 @@ class ResizeCropITKImage(FlowFileTransform):
         self.rescrop_dirpath = context.getProperty(self.rescrop_dir.name).getValue()
         self.already_rescropped = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
         self.nifti_data_name = context.getProperty(self.nifti_data_type.name).getValue()
+        self.resample_spacing_resolution = context.getProperty(self.spacing_resolution.name).asFloat()
+        self.target_dims_json_str = context.getProperty(self.dimensions.name).getValue()
 
     def mkdir_prep_dir(self, dirpath):
         """make preprocess directory if doesn't exist"""
@@ -84,11 +100,13 @@ class ResizeCropITKImage(FlowFileTransform):
         resampler.SetReferenceImage(input_image)
         resampler.SetOutputSpacing(new_resolution)
         resampler.SetSize(target_shape)
+        # offset = (2, 2, 2)
+        # new_output_origin = tuple(new_affine.GetTranslation()) + offset
+        # resampler.SetOutputOrigin(sitk.VectorDouble(new_output_origin))
         resampler.SetOutputOrigin(sitk.VectorDouble(new_affine.GetTranslation()))
         resampler.SetOutputDirection(new_affine.GetMatrix())
-        # if is_binary_mask:
         resampler.SetInterpolator(sitk.sitkNearestNeighbor)
-        resampler.SetTransform(new_affine)
+        # resampler.SetTransform(new_affine)
         resampled_image = resampler.Execute(input_image)
         return resampled_image
 
@@ -109,20 +127,34 @@ class ResizeCropITKImage(FlowFileTransform):
             self.logger.info("Retrieved Prepped Resized & Cropped voxel filepaths stored at : {}/".format(resized_cropped_dir))
         else:
             # TODO (JG): Could Add NiFi Properties to set these parameters
-            # target_shape = [96, 128, 128]
-            target_shape = [128, 128, 96]
-            # Based on incoming corrected bias image
-            # target_shape = [64, 85, 85]
-            new_resolution = [2.0, 2.0, 2.0]
+            target_dims_dict = json.loads(self.target_dims_json_str)
+            for dim_key in self.expected_dim_keys:
+                if dim_key not in target_dims_dict:
+                    self.logger.error("The key '{}' is missing or incorrect in the JSON data.".format(dim_key))
+            
+            target_shape = [target_dims_dict['width'], target_dims_dict['height'], target_dims_dict['depth']]
+            # new_resolution = [2.0, 2.0, 2.0]
+            # 2 is larger than 4
+            new_resolution = [self.resample_spacing_resolution,]*3
+            self.logger.info("new_resolution len = {}".format(len(new_resolution)))
+            self.logger.info("new_resolution list = {}".format(new_resolution))
 
             # Create a new affine matrix for resizing and cropping
             new_affine = sitk.AffineTransform(3)
             new_affine.SetMatrix([new_resolution[0], 0, 0,
                                   0, new_resolution[1], 0,
                                   0, 0, new_resolution[2]])
-            new_affine.SetTranslation([target_shape[0] * new_resolution[0] / 2*-1,
-                                target_shape[1] * new_resolution[1] / 2*-1,
-                                target_shape[2] * new_resolution[2] / 2*-1])
+            new_affine.SetTranslation([-target_shape[0] * new_resolution[0] / 2,
+                                -target_shape[1] * new_resolution[1] / 2,
+                                -target_shape[2] * new_resolution[2] / 2])
+
+            # Create a homogeneous transformation matrix
+            homogeneous_matrix_tuple = new_affine.GetMatrix()
+            new_affine_matrix_list = list(homogeneous_matrix_tuple)
+            self.logger.info("len(new_affine_matrix_list) = {}".format(len(new_affine_matrix_list)))
+            new_affine_matrix_list[len(new_affine_matrix_list)-1] = 1.0
+            new_affine_matrix__modified = tuple(new_affine_matrix_list)
+            new_affine.SetMatrix(new_affine_matrix__modified)
 
             for i in tqdm(range(len(nifti_csv_data))):
                 # Load the image using ITK

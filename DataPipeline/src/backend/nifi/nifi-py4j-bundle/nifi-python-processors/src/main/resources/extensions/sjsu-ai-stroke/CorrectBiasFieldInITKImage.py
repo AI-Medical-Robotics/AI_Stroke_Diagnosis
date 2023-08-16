@@ -106,7 +106,7 @@ class CorrectBiasFieldInITKImage(FlowFileTransform):
                 self.logger.info("input_image.GetDimension() = {}".format(input_image.GetDimension()))
 
                 shrink_filter = sitk.ShrinkImageFilter()
-                shrink_filter.SetShrinkFactor(2)
+                shrink_filter.SetShrinkFactor(3)
 
                 shrunk_image = shrink_filter.Execute(input_image)
 
