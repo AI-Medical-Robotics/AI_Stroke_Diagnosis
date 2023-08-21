@@ -8,11 +8,19 @@ First we go over how to build NiFi 2.0 Snapshot with Python Processor extensibil
 # conda create --name stroke_ai_nifi -c conda-forge openjdk==17.0.7.4 maven==3.9.2 python==3.9.17
 conda create --name stroke_ai_nifi python==3.9.17
 
+sudo apt -y install openjdk-17-jdk
+
+# Download maven 3.9.2+
+# go: https://maven.apache.org/download.cgi
+
 # get bin/java path
 which java
 
 # Get alt java paths
 update-alternatives --list java
+
+# Follow the steps here to install maven
+# go: https://phoenixnap.com/kb/install-maven-on-ubuntu
 
 source /etc/profile.d/maven.sh
 
