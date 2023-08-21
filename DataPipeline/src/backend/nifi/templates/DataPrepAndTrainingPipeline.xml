@@ -75,37 +75,8 @@
             <comments></comments>
             <contents>
                 <connections>
-                    <id>70f9895d-a305-3262-0000-000000000000</id>
+                    <id>51676d17-5586-3ba5-0000-000000000000</id>
                     <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
-                    <versionedComponentId>70f9895d-a305-3262-b19a-926008581ae6</versionedComponentId>
-                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
-                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
-                    <destination>
-                        <groupId>4ecac4be-41e4-30f2-0000-000000000000</groupId>
-                        <id>bc48e065-872c-37dd-0000-000000000000</id>
-                        <type>PROCESSOR</type>
-                        <versionedComponentId>bc48e065-872c-37dd-baa4-1cfece12c740</versionedComponentId>
-                    </destination>
-                    <flowFileExpiration>0 sec</flowFileExpiration>
-                    <labelIndex>1</labelIndex>
-                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
-                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
-                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
-                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
-                    <name></name>
-                    <selectedRelationships>success</selectedRelationships>
-                    <source>
-                        <groupId>4ecac4be-41e4-30f2-0000-000000000000</groupId>
-                        <id>c6f2307f-4a03-3b04-0000-000000000000</id>
-                        <type>PROCESSOR</type>
-                        <versionedComponentId>c6f2307f-4a03-3b04-97a0-ca3a869ae27c</versionedComponentId>
-                    </source>
-                    <zIndex>0</zIndex>
-                </connections>
-                <connections>
-                    <id>90c5e67a-05a4-3464-0000-000000000000</id>
-                    <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
-                    <versionedComponentId>90c5e67a-05a4-3464-afaa-745b80891a0e</versionedComponentId>
                     <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
                     <backPressureObjectThreshold>10000</backPressureObjectThreshold>
                     <destination>
@@ -124,9 +95,34 @@
                     <selectedRelationships>success</selectedRelationships>
                     <source>
                         <groupId>4ecac4be-41e4-30f2-0000-000000000000</groupId>
-                        <id>bc48e065-872c-37dd-0000-000000000000</id>
+                        <id>e40ad18d-cd86-3eee-0000-000000000000</id>
                         <type>PROCESSOR</type>
-                        <versionedComponentId>bc48e065-872c-37dd-baa4-1cfece12c740</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>7c10100e-208f-3a5e-0000-000000000000</id>
+                    <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>4ecac4be-41e4-30f2-0000-000000000000</groupId>
+                        <id>e40ad18d-cd86-3eee-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>4ecac4be-41e4-30f2-0000-000000000000</groupId>
+                        <id>c6f2307f-4a03-3b04-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>c6f2307f-4a03-3b04-97a0-ca3a869ae27c</versionedComponentId>
                     </source>
                     <zIndex>0</zIndex>
                 </connections>
@@ -139,53 +135,6 @@
                     </position>
                     <versionedComponentId>4e3b4c8a-ef77-3dbc-89f8-9e32993cbf55</versionedComponentId>
                 </funnels>
-                <processors>
-                    <id>bc48e065-872c-37dd-0000-000000000000</id>
-                    <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
-                    <position>
-                        <x>-352.0</x>
-                        <y>-160.0</y>
-                    </position>
-                    <versionedComponentId>bc48e065-872c-37dd-baa4-1cfece12c740</versionedComponentId>
-                    <bundle>
-                        <artifact>python-extensions</artifact>
-                        <group>org.apache.nifi</group>
-                        <version>0.0.1-SNAPSHOT</version>
-                    </bundle>
-                    <config>
-                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
-                        <bulletinLevel>WARN</bulletinLevel>
-                        <comments></comments>
-                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
-                        <descriptors>
-                            <entry>
-<key>ICPSR38464 Dataset Base Path</key>
-<value>
-    <name>ICPSR38464 Dataset Base Path</name>
-</value>
-                            </entry>
-                        </descriptors>
-                        <executionNode>ALL</executionNode>
-                        <lossTolerant>false</lossTolerant>
-                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
-                        <penaltyDuration>30 sec</penaltyDuration>
-                        <properties>
-                            <entry>
-<key>ICPSR38464 Dataset Base Path</key>
-                            </entry>
-                        </properties>
-                        <retryCount>10</retryCount>
-                        <runDurationMillis>0</runDurationMillis>
-                        <schedulingPeriod>0 sec</schedulingPeriod>
-                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
-                        <yieldDuration>1 sec</yieldDuration>
-                    </config>
-                    <executionNodeRestricted>false</executionNodeRestricted>
-                    <name>GetICPSR38464NiFTiFiles</name>
-                    <state>STOPPED</state>
-                    <style/>
-                    <type>python.GetICPSR38464NiFTiFiles</type>
-                </processors>
                 <processors>
                     <id>c6f2307f-4a03-3b04-0000-000000000000</id>
                     <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
@@ -297,6 +246,68 @@
                     <state>STOPPED</state>
                     <style/>
                     <type>org.apache.nifi.processors.standard.GenerateFlowFile</type>
+                </processors>
+                <processors>
+                    <id>e40ad18d-cd86-3eee-0000-000000000000</id>
+                    <parentGroupId>4ecac4be-41e4-30f2-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-352.0</x>
+                        <y>-144.0</y>
+                    </position>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ICPSR38464 Dataset Base Path</key>
+<value>
+    <name>ICPSR38464 Dataset Base Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ICPSR38464 Dataset Base Path</key>
+<value>/media/james/ai_projects/data/ICPSR_38464_Stroke_Data/MRI-DS-1-48</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GetICPSR38464NIfTIFiles</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.GetICPSR38464NIfTIFiles</type>
                 </processors>
             </contents>
             <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
@@ -1596,5 +1607,5 @@
             <variables/>
         </processGroups>
     </snippet>
-    <timestamp>08/21/2023 04:01:45 PDT</timestamp>
+    <timestamp>08/21/2023 06:14:08 PDT</timestamp>
 </template>
