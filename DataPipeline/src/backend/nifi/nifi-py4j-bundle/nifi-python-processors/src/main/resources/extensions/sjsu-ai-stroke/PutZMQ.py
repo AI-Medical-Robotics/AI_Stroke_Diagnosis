@@ -29,7 +29,7 @@ class PutZMQ(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['pandas', 'tqdm', 'zmq', 'pickle']
+        dependencies = ['pandas', 'tqdm', 'pyzmq', 'pickle']
         description = 'Gets the prepped NIfTI filepaths from the pandas csv dataframe in the flow file, sends the pandas dataframe over ZMQ'
         tags = ['sjsu_ms_ai', 'csv', 'zmq', 'nifti']
 
