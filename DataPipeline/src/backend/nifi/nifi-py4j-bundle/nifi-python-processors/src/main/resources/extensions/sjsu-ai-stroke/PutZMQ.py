@@ -17,7 +17,7 @@ import io
 import os
 import zmq
 import time
-import pickle
+import pickle5 as pickle
 import pandas as pd
 from tqdm import tqdm
 from nifiapi.properties import PropertyDescriptor
@@ -29,7 +29,7 @@ class PutZMQ(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['pandas', 'tqdm', 'pyzmq', 'pickle']
+        dependencies = ['pandas', 'tqdm', 'pyzmq', 'pickle5']
         description = 'Gets the prepped NIfTI filepaths from the pandas csv dataframe in the flow file, sends the pandas dataframe over ZMQ'
         tags = ['sjsu_ms_ai', 'csv', 'zmq', 'nifti']
 
