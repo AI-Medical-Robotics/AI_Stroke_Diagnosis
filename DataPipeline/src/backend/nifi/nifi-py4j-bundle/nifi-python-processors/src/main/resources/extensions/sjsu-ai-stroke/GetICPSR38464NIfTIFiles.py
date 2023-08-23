@@ -24,7 +24,7 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
 
     class ProcessorDetails:
-        dependencies = ['pandas']
+        dependencies = ['pandas==1.3.5']
         version = '0.0.1-SNAPSHOT'
         description = 'Gets NIfTI ICPSR 38464 filepaths and loads them into a pandas csv dataframe to be accessible from a flow file'
         tags = ['sjsu_ms_ai', 'csv', 'nifti']
