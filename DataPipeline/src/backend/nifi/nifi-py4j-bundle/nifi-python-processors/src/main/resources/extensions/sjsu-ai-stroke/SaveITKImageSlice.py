@@ -27,7 +27,7 @@ class SaveITKImageSlice(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['itk', 'pandas', 'matplotlib', 'numpy', 'tqdm']
+        dependencies = ['itk==5.3.0', 'pandas==1.3.5', 'matplotlib', 'tqdm==4.66.1']
         description = 'Gets a sample index for a NIfTI filepath for a particular stage in the AI stroke diagnosis pipeline located in the pandas csv dataframe column in the flow file, loads that NIfTI file as an ITK voxel, slices that voxel into a 2D image slice and save it as a png image'
         tags = ['sjsu_ms_ai', 'csv', 'itk', 'matplotlib', 'nifti']
 
