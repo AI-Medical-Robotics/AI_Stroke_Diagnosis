@@ -1,31 +1,10 @@
 import os
-import cv2
-import glob
 import random
-from PIL import Image
 import nibabel as nib
-import pandas as pd
 import numpy as np
-from tqdm import tqdm
 from matplotlib import pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix, f1_score
-from tensorflow.keras.utils import plot_model, normalize
-#, class_weight
 
-from tensorflow.keras.metrics import Accuracy, Precision, Recall, MeanIoU, BinaryAccuracy
-from medpy.metric.binary import hd, dc
-
-import SimpleITK as sitk
-from nilearn.image import math_img
-from nilearn import image as nii
-from nilearn import plotting
-from nipype.interfaces.ants import N4BiasFieldCorrection
-
-from nipype.interfaces.slicer.filtering.n4itkbiasfieldcorrection import N4ITKBiasFieldCorrection
-from nipype import Node, Workflow
-from nilearn.image import resample_img
 
 import uuid
 import tensorflow as tf
@@ -33,12 +12,18 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, UpSampling2D, concatenate, Conv2DTranspose, BatchNormalization, Dropout, Lambda, Activation, ReLU, LeakyReLU, PReLU
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
-import segmentation_models as sm
-from segmentation_models.metrics import iou_score
-focal_loss = sm.losses.cce_dice_loss
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
+# Reference perplexity.ai for switching segmentation_models iou_score and focal_loss to keras:
+# - https://www.perplexity.ai/search/b787fae0-f8c6-43ee-b6c5-3c7ad3f96ff3?s=u
+
+from tensorflow.keras.metrics import MeanIoU
+# from tensorflow.keras.losses import BinaryFocalCrossentropy
+
+# import segmentation_models as sm
+# from segmentation_models.metrics import iou_score
+# focal_loss = sm.losses.cce_dice_loss
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
@@ -136,6 +121,16 @@ class unet_3d:
 
         return model
 
+    # Referenced perplexity.ai for focal_loss implementation since its not available in tensorflow 2.6.0: 
+    # # https://www.perplexity.ai/search/ce25e8f4-2e4c-4569-be0a-8838d50e17c4?s=u
+    def focal_loss(self, y_true, y_pred, gamma=2.0, alpha=0.25):
+        epsilon = tf.keras.backend.epsilon()
+        y_pred = tf.clip_by_value(y_pred, epsilon, 1.0 - epsilon)
+        p_t = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        focal_loss = -alpha * tf.pow(1 - p_t, gamma) * tf.math.log(p_t)
+        return tf.reduce_mean(focal_loss)
+
+
     def training(self, images, labels, epochs=5, learning_rate=1e-4, batch_size=1):
         """
         training(...) pipeline loads the data and splits it into training and validation
@@ -178,8 +173,8 @@ class unet_3d:
         # self.unet3d.compile(optimizer=optimizer, loss="binary_crossentropy", 
         #     metrics=[iou_score, Precision(), Recall(), BinaryAccuracy()])
 
-        self.unet3d.compile(optimizer=optimizer, loss=focal_loss,
-                          metrics=[iou_score, "accuracy"])
+        self.unet3d.compile(optimizer=optimizer, loss=self.focal_loss,
+                          metrics=[MeanIoU(num_classes=1), "accuracy"])
 
         # Define callbacks
         # early_stopping = EarlyStopping(
@@ -188,14 +183,14 @@ class unet_3d:
 
         callbacks = callbacks = [
             ModelCheckpoint("best_stroke_lesion_mask_unet3d_epochs{}.h5".format(epochs), verbose=1, save_best_only=True,
-                           metrics=[iou_score, "accuracy"])
+                           metrics=[MeanIoU(num_classes=1), "accuracy"])
         ]
 
         # Train model
-        self.DAGMNet3D_result = self.unet3d.fit(x_train, y_train,
+        self.DAGMNet3D_result = self.unet3d.fit(self.x_train, self.y_train,
                             batch_size=batch_size,
                             epochs=epochs,
-                            validation_data=(x_val, y_val),
+                            validation_data=(self.x_val, self.y_val),
                             # class_weights=class_weights,
                             callbacks=callbacks)
 
@@ -428,6 +423,15 @@ class unet_2d:
         model = Model(inputs, outputs, name="2D-UNet")
         return model
     
+    # Referenced perplexity.ai for focal_loss implementation since its not available in tensorflow 2.6.0: 
+    # # https://www.perplexity.ai/search/ce25e8f4-2e4c-4569-be0a-8838d50e17c4?s=u
+    def focal_loss(y_true, y_pred, gamma=2.0, alpha=0.25):
+        epsilon = tf.keras.backend.epsilon()
+        y_pred = tf.clip_by_value(y_pred, epsilon, 1.0 - epsilon)
+        p_t = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        focal_loss = -alpha * tf.pow(1 - p_t, gamma) * tf.math.log(p_t)
+        return tf.reduce_mean(focal_loss)
+
     # training function part of preprocessing class
     def training(self, train_t1w_raw_ind, epochs=100, learn_rate=1e-2, batch_size=48):
 
@@ -461,15 +465,16 @@ class unet_2d:
         channels=1
         
         self.unet2d = self.build2D_unet(input_shape, n_classes=1)
-  
+
+
         # learning rate = 3E-4, 1E-5
         self.unet2d.summary()
-        self.unet2d.compile(optimizer=Adam(learning_rate=learn_rate), loss=focal_loss,
-                          metrics=[iou_score, "accuracy"])
+        self.unet2d.compile(optimizer=Adam(learning_rate=learn_rate), loss=self.focal_loss,
+                          metrics=[MeanIoU(num_classes=1), "accuracy"])
         # fitting the model
         callbacks = callbacks = [
             ModelCheckpoint("best_stroke_lesion_mask_unet2d_epochs{}.h5".format(epochs), verbose=1, save_best_only=True,
-                           metrics=[iou_score, "accuracy"])
+                           metrics=[MeanIoU(num_classes=1), "accuracy"])
         ]
         self.unet2d_result = self.unet2d.fit(train_gen, steps_per_epoch=16, epochs=epochs,
                                validation_data = val_gen, validation_steps=16,
@@ -532,105 +537,105 @@ class unet_2d:
         plt.close(f)
         return save_plot_metrics_file
         
-    def inference(self, mri_3d_path, results_seg_path):
-        """Generates prediction for a sample image and does the plotting: img_path refers to mri_3d_path"""
-        if not os.path.exists(results_seg_path):
-            os.makedirs(results_seg_path)
+#     def inference(self, mri_3d_path, results_seg_path):
+#         """Generates prediction for a sample image and does the plotting: img_path refers to mri_3d_path"""
+#         if not os.path.exists(results_seg_path):
+#             os.makedirs(results_seg_path)
         
-        # applying bias correction
-        n4 = N4BiasFieldCorrection()
-        n4.inputs.dimension = 3
-        n4.inputs.shrink_factor = 3
-        n4.inputs.n_iterations = [20, 10, 10, 5]
-        n4.inputs.input_image = mri_3d_path
-        n4.inputs.output_image = mri_3d_path
-        res = n4.run()
-        print("Applied Bias Correction")
+#         # applying bias correction
+#         n4 = N4BiasFieldCorrection()
+#         n4.inputs.dimension = 3
+#         n4.inputs.shrink_factor = 3
+#         n4.inputs.n_iterations = [20, 10, 10, 5]
+#         n4.inputs.input_image = mri_3d_path
+#         n4.inputs.output_image = mri_3d_path
+#         res = n4.run()
+#         print("Applied Bias Correction")
         
-        # resizing and cropping
-        target_shape = np.array((96,128,160))
-        new_resolution = [2,]*3
-        new_affine = np.zeros((4,4))
-        new_affine[:3,:3] = np.diag(new_resolution)
-        # putting point 0,0,0 in the middle of the new volume - this
-        # could be refined in the future
-        new_affine[:3,3] = target_shape*new_resolution/2.*-1
-        new_affine[3,3] = 1.
-        downsampled_and_cropped_nii = resample_img(mri_3d_path, target_affine=new_affine,
-                    target_shape=target_shape, interpolation="nearest")
-        downsampled_and_cropped_nii.to_filename(mri_3d_path)
-        mri_voxel = sitk.ReadImage(mri_3d_path)
-        print("Resized & Cropped to mri_voxel.shape")
+#         # resizing and cropping
+#         target_shape = np.array((96,128,160))
+#         new_resolution = [2,]*3
+#         new_affine = np.zeros((4,4))
+#         new_affine[:3,:3] = np.diag(new_resolution)
+#         # putting point 0,0,0 in the middle of the new volume - this
+#         # could be refined in the future
+#         new_affine[:3,3] = target_shape*new_resolution/2.*-1
+#         new_affine[3,3] = 1.
+#         downsampled_and_cropped_nii = resample_img(mri_3d_path, target_affine=new_affine,
+#                     target_shape=target_shape, interpolation="nearest")
+#         downsampled_and_cropped_nii.to_filename(mri_3d_path)
+#         mri_voxel = sitk.ReadImage(mri_3d_path)
+#         print("Resized & Cropped to mri_voxel.shape")
         
-        # intensity normalizing
-        resacleFilter = sitk.RescaleIntensityImageFilter()
-        resacleFilter.SetOutputMaximum(255)
-        resacleFilter.SetOutputMinimum(0)
-        mri_voxel = resacleFilter.Execute(mri_voxel)
-        sitk.WriteImage(mri_voxel, mri_3d_path)
-        print("Applied Intensity Normalization")
+#         # intensity normalizing
+#         resacleFilter = sitk.RescaleIntensityImageFilter()
+#         resacleFilter.SetOutputMaximum(255)
+#         resacleFilter.SetOutputMinimum(0)
+#         mri_voxel = resacleFilter.Execute(mri_voxel)
+#         sitk.WriteImage(mri_voxel, mri_3d_path)
+#         print("Applied Intensity Normalization")
         
-        # getting predictions: do predictions on all of MRI 2D slices of a patients MRI 3D voxel
-        orig_mri_voxel = nib.load(mri_3d_path).get_data()
+#         # getting predictions: do predictions on all of MRI 2D slices of a patients MRI 3D voxel
+#         orig_mri_voxel = nib.load(mri_3d_path).get_data()
         
-        patient_orig_mri_slices = [] # 125 * 96 = 12K
-        # loop num patients had 3D MRIs = 125; get each voxel (3D image)
-            # each 3D MRI has 96 MRI 2D slices
+#         patient_orig_mri_slices = [] # 125 * 96 = 12K
+#         # loop num patients had 3D MRIs = 125; get each voxel (3D image)
+#             # each 3D MRI has 96 MRI 2D slices
 
-        orig_mri_slices = [orig_mri_slice for orig_mri_slice in tqdm(orig_mri_voxel)]
-        print("len(orig_mri_slices) = {}".format(len(orig_mri_slices)))
-        patient_orig_mri_slices.extend(orig_mri_slices)
+#         orig_mri_slices = [orig_mri_slice for orig_mri_slice in tqdm(orig_mri_voxel)]
+#         print("len(orig_mri_slices) = {}".format(len(orig_mri_slices)))
+#         patient_orig_mri_slices.extend(orig_mri_slices)
             
-        patients_mri_slices_testset = np.array(patient_orig_mri_slices)
-        patients_mri_slices_testset = np.expand_dims(patients_mri_slices_testset, axis = 3)
+#         patients_mri_slices_testset = np.array(patient_orig_mri_slices)
+#         patients_mri_slices_testset = np.expand_dims(patients_mri_slices_testset, axis = 3)
         
-#         orig_mri_voxel = np.expand_dims(orig_mri_voxel, -1) # accounts for the np.zeros similar to saw in data_gen, but previous 5d (batch, 96, 128, 160, 1)
-#         orig_mri_voxel = np.expend_dims(orig_mri_voxel, 0) # we need new 4d (batch, 128, 160, 1); I think just need to comment out
-        model = load_model("best_stroke_lesion_mask_unet2d.h5", custom_objects={
-            "categorical_crossentropy_plus_dice_loss": focal_loss,
-            "iou_score": iou_score})
-        pred_mri_slices = model.predict(patients_mri_slices_testset)
-        print("len(pred_mri_slices) = {}".format(len(pred_mri_slices)))
-        pred_mri_slices = np.squeeze(pred_mri_slices)
-        orig_mri_voxel = nib.load(mri_3d_path).get_data()
-        print("Performed Stroke Lesion Segmentation")
+# #         orig_mri_voxel = np.expand_dims(orig_mri_voxel, -1) # accounts for the np.zeros similar to saw in data_gen, but previous 5d (batch, 96, 128, 160, 1)
+# #         orig_mri_voxel = np.expend_dims(orig_mri_voxel, 0) # we need new 4d (batch, 128, 160, 1); I think just need to comment out
+#         model = load_model("best_stroke_lesion_mask_unet2d.h5", custom_objects={
+#             "categorical_crossentropy_plus_dice_loss": focal_loss,
+#             "iou_score": iou_score})
+#         pred_mri_slices = model.predict(patients_mri_slices_testset)
+#         print("len(pred_mri_slices) = {}".format(len(pred_mri_slices)))
+#         pred_mri_slices = np.squeeze(pred_mri_slices)
+#         orig_mri_voxel = nib.load(mri_3d_path).get_data()
+#         print("Performed Stroke Lesion Segmentation")
         
-        # converting prediction to nifti file
-        func = nib.load(mri_3d_path)
-        ni_mri_voxel = nib.Nifti1Image(pred_mri_slices, func.affine)
-        nib.save(ni_mri_voxel, "pred_T1w_stroke_lesion_mask.nii.gz")
-        pred_mri_voxel = nib.load("pred_T1w_stroke_lesion_mask.nii.gz")
-        print("Converted Prediction to Nifti")
+#         # converting prediction to nifti file
+#         func = nib.load(mri_3d_path)
+#         ni_mri_voxel = nib.Nifti1Image(pred_mri_slices, func.affine)
+#         nib.save(ni_mri_voxel, "pred_T1w_stroke_lesion_mask.nii.gz")
+#         pred_mri_voxel = nib.load("pred_T1w_stroke_lesion_mask.nii.gz")
+#         print("Converted Prediction to Nifti")
         
-        # creating binary mask and stripping stroke lesion from raw image
-        pred_mask = math_img("img > 0.25", img = pred_mri_voxel)
-        crop = pred_mask.get_data()*orig_mri_voxel
-        print("Created Binary Mask & Stripped stroke lesion from Raw Img")
-        print("pred_mri_voxel.shape[0] = {}".format(pred_mri_voxel.shape[0]))
+#         # creating binary mask and stripping stroke lesion from raw image
+#         pred_mask = math_img("img > 0.25", img = pred_mri_voxel)
+#         crop = pred_mask.get_data()*orig_mri_voxel
+#         print("Created Binary Mask & Stripped stroke lesion from Raw Img")
+#         print("pred_mri_voxel.shape[0] = {}".format(pred_mri_voxel.shape[0]))
         
-        # plotting predictions
-        pred_mri_voxel = nib.load("pred_T1w_stroke_lesion_mask.nii.gz").get_data()
+#         # plotting predictions
+#         pred_mri_voxel = nib.load("pred_T1w_stroke_lesion_mask.nii.gz").get_data()
         
-        steps = int(len(orig_mri_voxel)/2)
-        print("Run inference {} times based on 'len(orig_mri_voxel)/2'".format(steps))
-        for i in range(0, len(orig_mri_voxel), steps): # raw_mri_voxel[i]
-            fig, ax = plt.subplots(1,3,figsize=(15,10))
-            ax[0].set_title("T1w Original MRI Slice {} (cropped)".format(i))
-            ax[0].imshow(orig_mri_voxel[i])
-            ax[1].set_title("T1w Stroke Lesion Segmentation MRI Slice {}".format(i))
-            ax[1].imshow(pred_mri_voxel[i])
-            ax[2].set_title("T1w Stroke Lesion Stripped MRI Slice {}".format(i))
-            ax[2].imshow(crop[i])
+#         steps = int(len(orig_mri_voxel)/2)
+#         print("Run inference {} times based on 'len(orig_mri_voxel)/2'".format(steps))
+#         for i in range(0, len(orig_mri_voxel), steps): # raw_mri_voxel[i]
+#             fig, ax = plt.subplots(1,3,figsize=(15,10))
+#             ax[0].set_title("T1w Original MRI Slice {} (cropped)".format(i))
+#             ax[0].imshow(orig_mri_voxel[i])
+#             ax[1].set_title("T1w Stroke Lesion Segmentation MRI Slice {}".format(i))
+#             ax[1].imshow(pred_mri_voxel[i])
+#             ax[2].set_title("T1w Stroke Lesion Stripped MRI Slice {}".format(i))
+#             ax[2].imshow(crop[i])
 
-            save_plot_metrics_file = "{}/{}_{}_pred_mri_slice_{}_uuid_{}.jpg".format(results_seg_path, "stroke_seg", model.name, i, uuid.uuid4())
-            fig.savefig(save_plot_metrics_file, bbox_inches="tight")
+#             save_plot_metrics_file = "{}/{}_{}_pred_mri_slice_{}_uuid_{}.jpg".format(results_seg_path, "stroke_seg", model.name, i, uuid.uuid4())
+#             fig.savefig(save_plot_metrics_file, bbox_inches="tight")
 
-        plt.show()
+#         plt.show()
         
-        # converting skull stripped to nifti file
-        ni_img = nib.Nifti1Image(crop, func.affine)
-        nib.save(ni_img, "pred_T1w_stroke_lesion_mask.nii.gz")
-        print("Predicted files stores as : pred_T1w_stroke_lesion_mask.nii.gz")
+#         # converting skull stripped to nifti file
+#         ni_img = nib.Nifti1Image(crop, func.affine)
+#         nib.save(ni_img, "pred_T1w_stroke_lesion_mask.nii.gz")
+#         print("Predicted files stores as : pred_T1w_stroke_lesion_mask.nii.gz")
         
     # def plotting(self, filename):
     #     """Plots an interactive plot"""
