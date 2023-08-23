@@ -28,7 +28,7 @@ class NormalizeIntensityInITKImage(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['SimpleITK', 'pandas', 'tqdm']
+        dependencies = ['SimpleITK==2.2.1', 'pandas==1.3.5', 'tqdm==4.66.1']
         description = 'Gets the resized and cropped NIfTI filepaths from the pandas csv dataframe in the flow file, loads each NIfTI file as an ITK voxel and performs SimpleITK intensity normalization on each 3D NIfTI voxel'
         tags = ['sjsu_ms_ai', 'csv', 'itk', 'nifti']
 
