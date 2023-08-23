@@ -29,7 +29,7 @@ class PutZMQ(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['pandas', 'tqdm', 'pyzmq', 'pickle5']
+        dependencies = ['pandas==1.3.5', 'tqdm==4.66.1', 'pyzmq==25.1.1', 'pickle5==0.0.11']
         description = 'Gets the prepped NIfTI filepaths from the pandas csv dataframe in the flow file, sends the pandas dataframe over ZMQ'
         tags = ['sjsu_ms_ai', 'csv', 'zmq', 'nifti']
 
@@ -99,6 +99,4 @@ class PutZMQ(FlowFileTransform):
         nifti_csv_df_bytes = self.zmq_publish_data(nifti_csv)
         self.logger.info("output: nifti_csv_df_bytes len = {}".format(len(nifti_csv_df_bytes)))
 
-        encoded_nifti_csv_df_bytes = nifti_csv_df_bytes.encode("utf-8")
-
-        return FlowFileTransformResult(relationship = "success", contents = encoded_nifti_csv_df_bytes)
+        return FlowFileTransformResult(relationship = "success", contents = nifti_csv_df_bytes)
