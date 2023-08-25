@@ -50,7 +50,7 @@ class PreprocessImagesForTorch(FlowFileTransform):
             required = True
         )
         self.already_prepped = PropertyDescriptor(
-            name = 'Already Prepreocessed Torch Images',
+            name = 'Already Preprocessed Torch Images',
             description = 'If Preprocessed Torch Images Already Performed, then just get filepaths',
             default_value=False,
             required = True,
@@ -89,7 +89,7 @@ class PreprocessImagesForTorch(FlowFileTransform):
         return {"true": True, "false": False}.get(string_input.lower())
 
     def onScheduled(self, context):
-        self.logger.info("Getting properties for bias_corrected_dirpath, etc")
+        self.logger.info("Getting properties for prep_torch_imgs_dirpath, etc")
         self.img_name_to_prep_img_map = list()
         # read pre-trained model and config file
         self.prep_torch_imgs_dirpath = context.getProperty(self.prep_torch_imgs_dir.name).getValue()

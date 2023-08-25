@@ -118,28 +118,31 @@ class MapImageIDsToCaptions(FlowFileTransform):
             #     input_image = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
 
             imgid_to_captions_map = {}
-
             for caption_label in caption_txt_labels.split("\n"):
 
                 tokens = caption_label.split(",")
                 if len(caption_label) < 2:
                     continue
                 
-                image_id, caption = tokens[0], tokens[1:]
+                image_id, captions = tokens[0], tokens[1:]
 
                 image_id = image_id.split(".")[0]
 
-                caption_str = " ".join(caption)
+                captions_str = " ".join(captions)
 
                 if image_id not in imgid_to_captions_map:
                     imgid_to_captions_map[image_id] = list()
 
-                imgid_to_captions_map[image_id].append(caption_str)
+                imgid_to_captions_map[image_id].append(captions_str)
 
-                imgid_to_caption_bytes = pickle.dumps(imgid_to_captions_map)
+            cap_pair_i = 0
+            for imgid_to_captions_pair in imgid_to_captions_map.items():
+
+                # loop through dictionary, save each key value pair as bytes to filesystem
+                imgid_to_caption_bytes = pickle.dumps(imgid_to_captions_pair)
 
                 # Save the image name mapped torch preprocessed image
-                output_path = os.path.join(imgid_to_caption_dir, self.jpeg_data_name + "_" + str(i) + ".pk1")
+                output_path = os.path.join(imgid_to_caption_dir, self.jpeg_data_name + "_" + str(cap_pair_i) + ".pk1")
                 self.logger.info("Mapped Image IDs to Captions pickle output_path = {}".format(output_path))
                 try:
                     with open(output_path, "wb") as file:
@@ -148,6 +151,7 @@ class MapImageIDsToCaptions(FlowFileTransform):
                 except Exception as e:
                     self.logger.error("An error occurred while saving Mapped Image IDs to Captions!!!: {}".format(e))
                 self.imgid_to_captions_files.append(output_path)
+                cap_pair_i += 1
 
         img_cap_csv_data["imgid_to_captions"] = self.imgid_to_captions_files
         self.logger.info("Mapped Image IDs to Captions pickle bytes stored at: {}/".format(imgid_to_caption_dir))

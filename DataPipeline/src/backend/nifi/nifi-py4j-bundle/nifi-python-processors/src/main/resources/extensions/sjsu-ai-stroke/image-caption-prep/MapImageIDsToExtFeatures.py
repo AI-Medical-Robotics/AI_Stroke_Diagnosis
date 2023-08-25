@@ -109,7 +109,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
                 # Load the image using PIL
                 if self.jpeg_data_name == "flickr":
                     with open(img_cap_csv_data.img_name_to_prep_img.iloc[i], "rb") as file:
-                        torch_prep_name_to_img = pickle.load(img_cap_csv_data.img_name_to_prep_img.iloc[i])
+                        torch_prep_name_to_img = pickle.load(file)
                 # elif self.jpeg_data_name == "atlas":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
                 # elif self.jpeg_data_name == "icpsr_stroke":
