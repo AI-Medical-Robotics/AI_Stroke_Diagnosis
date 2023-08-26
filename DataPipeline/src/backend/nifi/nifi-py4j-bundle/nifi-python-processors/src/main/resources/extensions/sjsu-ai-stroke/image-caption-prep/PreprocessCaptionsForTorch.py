@@ -44,7 +44,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
         self.prep_torch_captions_dir = PropertyDescriptor(
             name = 'Preprocessed Captions Destination Path',
             description = 'The folder to store the Preprocessed Captions.',
-            default_value="{}/src/datasets/flickr8k_NiFi/{}".format(os.path.expanduser("~"), "prep_torch_captions"),
+            default_value="{}/src/datasets/flickr8k_NiFi/{}".format(os.path.expanduser("~"), "map_imgids_to_prep_captions"),
             required = True
         )
         self.already_prepped = PropertyDescriptor(
@@ -65,7 +65,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
             default_value = "[^A-Za-z]",
             required=True
         )
-        self.descriptors = [self.prep_torch_captions_dir, self.already_prepped, self.cap_del_pattern]
+        self.descriptors = [self.prep_torch_captions_dir, self.already_prepped, self.jpeg_data_type, self.cap_del_pattern]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -80,7 +80,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
         self.prep_torch_captions_dirpath = context.getProperty(self.prep_torch_captions_dir.name).getValue()
         self.cap_prep_already_done = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
         self.jpeg_data_name = context.getProperty(self.jpeg_data_type.name).getValue()
-        self.cap_del_regex_pattern = context.getProperty(self.cap_del_pattern.name).asInteger()
+        self.cap_del_regex_pattern = context.getProperty(self.cap_del_pattern.name).getValue()
 
 
     def mkdir_prep_dir(self, dirpath):
@@ -106,22 +106,33 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
         else:
             self.logger.info("Doing the Captions Preprocessing From Scratch")
             for i in range(len(img_cap_csv_data)):
+                imgid_to_caps = None
                 imgid_to_prep_captions_dict = {}
                 # Load the image using PIL
                 if self.jpeg_data_name == "flickr":
+                    print("img_cap_csv_data.imgid_to_captions.iloc[i] = {}".format(img_cap_csv_data.imgid_to_captions.iloc[i]))
                     with open(img_cap_csv_data.imgid_to_captions.iloc[i], "rb") as file:
-                        imgid_to_captions = pickle.load(file)
+                        imgid_to_caps = pickle.load(file)
+                
+                        self.logger.info("check1: imgid_to_caps len = {}".format(len(imgid_to_caps)))
+                        self.logger.info("imgid_to_caps[0] image_id = {}".format(imgid_to_caps[0]))
+                        self.logger.info("imgid_to_caps[1] captions_str = {}".format(imgid_to_caps[1]))
+
+                self.logger.info("check2: imgid_to_caps len = {}".format(len(imgid_to_caps)))
+                # image_id = list(imgid_to_caps.keys())[0]
+                # captions_str = list(imgid_to_caps.values())[0]
+
+                image_id = imgid_to_caps[0]
+                captions_str = imgid_to_caps[1]
+
 
                 # elif self.jpeg_data_name == "atlas":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
                 # elif self.jpeg_data_name == "icpsr_stroke":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
 
-                image_id = list(imgid_to_captions.keys())[0]
-                captions_str = list(imgid_to_captions.values())[0]
-
                 for cap_i in range(len(captions_str)):
-                    caption = captions_str[i]
+                    caption = captions_str[cap_i]
                     # Convert to lowercase
                     caption = caption.lower()
 
@@ -134,7 +145,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
                     # add start and end tags to caption
                     caption = 'startseq ' + " ".join([word for word in caption.split() if len(word) > 1]) + ' endseq'
 
-                    captions_str[i] = caption
+                    captions_str[cap_i] = caption
 
                 imgid_to_prep_captions_dict[image_id] = captions_str
 
