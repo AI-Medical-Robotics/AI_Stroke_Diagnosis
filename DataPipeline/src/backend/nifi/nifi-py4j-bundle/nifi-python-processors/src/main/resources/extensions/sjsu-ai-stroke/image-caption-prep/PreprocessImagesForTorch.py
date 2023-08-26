@@ -125,7 +125,7 @@ class PreprocessImagesForTorch(FlowFileTransform):
                 torch_imgname_to_prepimg = {}
                 # Load the image using PIL
                 if self.jpeg_data_name == "flickr":
-                    input_image = PIL.Image(img_cap_csv_data.natural_image.iloc[i])
+                    input_image = PIL.Image.open(img_cap_csv_data.natural_image.iloc[i])
                     img_name = os.path.basename(img_cap_csv_data.natural_image.iloc[i])
                 # elif self.jpeg_data_name == "atlas":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
