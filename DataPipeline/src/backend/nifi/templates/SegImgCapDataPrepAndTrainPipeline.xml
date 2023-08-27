@@ -69,9 +69,8 @@
             <comments></comments>
             <contents>
                 <connections>
-                    <id>028ed5f0-1b31-3f4c-0000-000000000000</id>
+                    <id>deca5bb2-949f-3f27-0000-000000000000</id>
                     <parentGroupId>589a53ca-5dd6-3329-0000-000000000000</parentGroupId>
-                    <versionedComponentId>028ed5f0-1b31-3f4c-ad5a-0286e3e70ad4</versionedComponentId>
                     <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
                     <backPressureObjectThreshold>10000</backPressureObjectThreshold>
                     <destination>
@@ -90,23 +89,20 @@
                     <selectedRelationships>success</selectedRelationships>
                     <source>
                         <groupId>589a53ca-5dd6-3329-0000-000000000000</groupId>
-                        <id>34899c53-a0be-3bd2-0000-000000000000</id>
+                        <id>bc83c9fe-a0d3-3e11-0000-000000000000</id>
                         <type>PROCESSOR</type>
-                        <versionedComponentId>34899c53-a0be-3bd2-80c7-b928a808b7db</versionedComponentId>
                     </source>
                     <zIndex>0</zIndex>
                 </connections>
                 <connections>
-                    <id>ecee111d-307f-3f6d-0000-000000000000</id>
+                    <id>dfe00336-b660-39a7-0000-000000000000</id>
                     <parentGroupId>589a53ca-5dd6-3329-0000-000000000000</parentGroupId>
-                    <versionedComponentId>ecee111d-307f-3f6d-bcc0-3412af318e80</versionedComponentId>
                     <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
                     <backPressureObjectThreshold>10000</backPressureObjectThreshold>
                     <destination>
                         <groupId>589a53ca-5dd6-3329-0000-000000000000</groupId>
-                        <id>34899c53-a0be-3bd2-0000-000000000000</id>
+                        <id>bc83c9fe-a0d3-3e11-0000-000000000000</id>
                         <type>PROCESSOR</type>
-                        <versionedComponentId>34899c53-a0be-3bd2-80c7-b928a808b7db</versionedComponentId>
                     </destination>
                     <flowFileExpiration>0 sec</flowFileExpiration>
                     <labelIndex>1</labelIndex>
@@ -137,13 +133,12 @@
                     <type>INPUT_PORT</type>
                 </inputPorts>
                 <processors>
-                    <id>34899c53-a0be-3bd2-0000-000000000000</id>
+                    <id>bc83c9fe-a0d3-3e11-0000-000000000000</id>
                     <parentGroupId>589a53ca-5dd6-3329-0000-000000000000</parentGroupId>
                     <position>
-                        <x>-984.0</x>
-                        <y>-200.0</y>
+                        <x>-992.0</x>
+                        <y>-232.0</y>
                     </position>
-                    <versionedComponentId>34899c53-a0be-3bd2-80c7-b928a808b7db</versionedComponentId>
                     <bundle>
                         <artifact>python-extensions</artifact>
                         <group>org.apache.nifi</group>
@@ -167,12 +162,6 @@
     <name>Dataset Name</name>
 </value>
                             </entry>
-                            <entry>
-<key>NifTI Dataset Name</key>
-<value>
-    <name>NifTI Dataset Name</name>
-</value>
-                            </entry>
                         </descriptors>
                         <executionNode>ALL</executionNode>
                         <lossTolerant>false</lossTolerant>
@@ -185,10 +174,6 @@
                             </entry>
                             <entry>
 <key>Dataset Name</key>
-<value>nfbs</value>
-                            </entry>
-                            <entry>
-<key>NifTI Dataset Name</key>
 <value>nfbs</value>
                             </entry>
                         </properties>
@@ -3596,5 +3581,5 @@
             <variables/>
         </processGroups>
     </snippet>
-    <timestamp>08/27/2023 07:36:48 PDT</timestamp>
+    <timestamp>08/27/2023 07:48:36 PDT</timestamp>
 </template>
