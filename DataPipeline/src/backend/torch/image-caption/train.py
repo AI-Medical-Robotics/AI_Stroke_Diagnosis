@@ -61,15 +61,15 @@ def train_cnn_lstm(data_csv_df):
     #     input_mask_index_img = sitk.ReadImage(data_csv_df.mask_index.iloc[i])
     #     mask_index_imgs.append(input_mask_index_img)
 
-    print("Loading NFBS Data Prepped Images: raw_index_imgs")
+    # print("Loading NFBS Data Prepped Images: raw_index_imgs")
     # for i in tqdm(range(len(data_csv_df))):
     #     # Load the image using ITK
     #     input_raw_index_img = sitk.ReadImage(data_csv_df.raw_index.iloc[i])
     #     raw_index_imgs.append(input_raw_index_img)
         
-    print("Loaded NFBS Data Prepped Images: raw_index_imgs len = {}".format(len(data_csv_df.raw_index.tolist())))
+    # print("Loaded NFBS Data Prepped Images: raw_index_imgs len = {}".format(len(data_csv_df.raw_index.tolist())))
 
-    print("Passing NFBS Data Prepped Image path: mask_index_imgs len = {}".format(len(data_csv_df.mask_index.tolist())))
+    # print("Passing NFBS Data Prepped Image path: mask_index_imgs len = {}".format(len(data_csv_df.mask_index.tolist())))
 
     # X_train,X_test,y_train,y_test = skull_strip_seg_unet2d.split(raw_index_imgs, mask_index_imgs)
     # X_train,X_test,y_train,y_test = skull_strip_seg_unet2d.split(data_csv_df.raw_index.tolist(), data_csv_df.mask_index.tolist())
