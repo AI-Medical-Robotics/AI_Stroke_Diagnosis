@@ -1,0 +1,3594 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<template encoding-version="1.3">
+    <description></description>
+    <groupId>37b3e054-018a-1000-aab3-4aaadf6a473b</groupId>
+    <name>BizonAISegImgCapDataPrepAndTrainPipeline</name>
+    <snippet>
+        <connections>
+            <id>8ea5c477-6075-36a8-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <versionedComponentId>8ea5c477-6075-36a8-b65b-ea915fa47857</versionedComponentId>
+            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+            <destination>
+                <groupId>404b9cb1-6b98-355e-0000-000000000000</groupId>
+                <id>be54120e-f5d5-340a-0000-000000000000</id>
+                <type>INPUT_PORT</type>
+                <versionedComponentId>a8984837-45ee-3ba2-8c7b-2a412a25a0b1</versionedComponentId>
+            </destination>
+            <flowFileExpiration>0 sec</flowFileExpiration>
+            <labelIndex>1</labelIndex>
+            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+            <name></name>
+            <source>
+                <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                <id>902f3a17-ca54-3c23-0000-000000000000</id>
+                <type>OUTPUT_PORT</type>
+                <versionedComponentId>b8dbafc0-acb6-339b-8234-cba556d66457</versionedComponentId>
+            </source>
+            <zIndex>0</zIndex>
+        </connections>
+        <connections>
+            <id>dbce3cf1-acb0-36fd-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <versionedComponentId>dbce3cf1-acb0-36fd-b292-5f76bb011832</versionedComponentId>
+            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+            <destination>
+                <groupId>4188e8ec-957d-3d25-0000-000000000000</groupId>
+                <id>93301b03-91e2-3b77-0000-000000000000</id>
+                <type>INPUT_PORT</type>
+                <versionedComponentId>fead95a1-1bb7-3c37-bdad-36eda1260bfc</versionedComponentId>
+            </destination>
+            <flowFileExpiration>0 sec</flowFileExpiration>
+            <labelIndex>1</labelIndex>
+            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+            <name></name>
+            <source>
+                <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                <id>934192bd-3aa8-3289-0000-000000000000</id>
+                <type>OUTPUT_PORT</type>
+                <versionedComponentId>a43b5ca4-b79e-337f-bacf-8ff73c88a599</versionedComponentId>
+            </source>
+            <zIndex>0</zIndex>
+        </connections>
+        <processGroups>
+            <id>332ebba2-7328-32a4-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <position>
+                <x>864.0</x>
+                <y>0.0</y>
+            </position>
+            <versionedComponentId>332ebba2-7328-32a4-93f4-7b3e004c385c</versionedComponentId>
+            <comments></comments>
+            <contents>
+                <connections>
+                    <id>1b18b300-e165-306a-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>2d2aff7f-73f6-3480-9b32-85bc02c52ef1</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>db7881d5-ea8d-3740-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>be3ff68a-941d-3f54-9b15-b717a4163a8d</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>1e0c7f23-c2a0-3c52-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>d00e71d8-79f1-3cb3-89f2-1d8847794c3e</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>23e44dd4-e56d-3915-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>4c2f286b-49a2-379d-bc18-2a068d004700</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <bends>
+                        <x>576.0</x>
+                        <y>632.0</y>
+                    </bends>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>25dd6dd1-bb6c-34a7-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>6e5597ea-8b21-3e63-abb5-9d708d169966</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8f971560-b8ce-3927-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>7e516c4a-8090-3eba-ad54-bd0d3a15500f</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>2d1c7cef-bfce-374a-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>1d29e4ca-3cca-30d8-89b8-cf46b05c83a1</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>b5944ab0-dd82-3a2a-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>d724da99-847a-33e7-837c-a1c1c6f867b0</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>626ab7ed-9331-3f96-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>4409396e-0e85-33d3-8031-5fe7d51a1e81</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>308ab6a6-3818-369f-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>84a63bd5-afce-3377-8203-72c102a3e146</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>626ab7ed-9331-3f96-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>4409396e-0e85-33d3-8031-5fe7d51a1e81</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8e7c0071-4136-30e4-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>16745e97-9797-3fd9-bdc4-e4cb57123f80</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>33a1b908-4f7b-3765-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>d3fe6f05-39e9-35a9-a898-74b9e008ea3b</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>b68a5513-f35d-3bdc-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>a2bd666e-de73-3939-88d9-b72d26899c0b</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8e7c0071-4136-30e4-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>16745e97-9797-3fd9-bdc4-e4cb57123f80</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>3561ee10-0fe3-3256-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>d2294957-ae97-38c4-a48f-2c31a2bf1d66</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4a155348-0f0c-34ac-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>3e1d86ca-24dc-39d8-bfee-e304fc578245</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4b5396a6-7dda-3df1-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>bac2b0ad-1cda-38d8-9563-11c2ca3b27e0</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>374d9577-564c-30f3-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>95181dfb-3eb2-3b55-8ba9-ac2665e45281</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8f971560-b8ce-3927-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>7e516c4a-8090-3eba-ad54-bd0d3a15500f</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>1e0c7f23-c2a0-3c52-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>d00e71d8-79f1-3cb3-89f2-1d8847794c3e</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>3759c69d-29a4-302e-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8e7c0071-4136-30e4-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>16745e97-9797-3fd9-bdc4-e4cb57123f80</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>bca9e07e-3e81-3909-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>3c9f7d01-7a68-32e0-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>4b241be6-60cc-39b9-b113-b4289afd993f</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <bends>
+                        <x>856.0</x>
+                        <y>720.0</y>
+                    </bends>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>25dd6dd1-bb6c-34a7-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>6e5597ea-8b21-3e63-abb5-9d708d169966</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4a155348-0f0c-34ac-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>3e1d86ca-24dc-39d8-bfee-e304fc578245</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>61bee35a-2abd-3522-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>86883978-5e27-36ea-89b4-2d28eee7a332</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>15a84e17-ceee-31fb-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>ede1f438-3eee-31a4-b9fa-6a9d9bf8a9de</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>8e7c0071-4136-30e4-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>16745e97-9797-3fd9-bdc4-e4cb57123f80</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>8022f685-5a3e-35d9-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>dd052be4-aae2-3323-a07f-41af23f01f30</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>1e0c7f23-c2a0-3c52-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>d00e71d8-79f1-3cb3-89f2-1d8847794c3e</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>15a84e17-ceee-31fb-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>ede1f438-3eee-31a4-b9fa-6a9d9bf8a9de</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>9c6cf137-1612-37d8-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>0cf6f04d-c8dd-34e8-b170-a9742cf0e59f</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>7deaef0c-3b1d-3b4c-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>e0574128-6705-35d9-8594-3e151c7a2808</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4b5396a6-7dda-3df1-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>bac2b0ad-1cda-38d8-9563-11c2ca3b27e0</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>b1cab2d5-2acc-33d6-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>b1cab2d5-2acc-33d6-b599-4093bea8e15a</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>902f3a17-ca54-3c23-0000-000000000000</id>
+                        <type>OUTPUT_PORT</type>
+                        <versionedComponentId>b8dbafc0-acb6-339b-8234-cba556d66457</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>a5d769a2-b82b-3a8c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>a5d769a2-b82b-3a8c-8a08-1cddd5227ea5</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>c7bbb68f-15ff-3e6d-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>a636b949-c064-3988-a52b-fe12706de910</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4b5396a6-7dda-3df1-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>bac2b0ad-1cda-38d8-9563-11c2ca3b27e0</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>626ab7ed-9331-3f96-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>4409396e-0e85-33d3-8031-5fe7d51a1e81</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>e77da528-a20a-3d0d-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>e77da528-a20a-3d0d-a29e-17b2a4f87c86</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>a5d769a2-b82b-3a8c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>a5d769a2-b82b-3a8c-8a08-1cddd5227ea5</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>25dd6dd1-bb6c-34a7-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>6e5597ea-8b21-3e63-abb5-9d708d169966</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>f603a08d-11ed-307a-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>119c318b-735a-3f9f-b899-70813972acdd</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>4e392470-1b83-3af6-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>002575ed-b39c-399a-bfe6-87c49768f832</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>15a84e17-ceee-31fb-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>ede1f438-3eee-31a4-b9fa-6a9d9bf8a9de</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>f76dae4c-6640-3499-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <versionedComponentId>f76dae4c-6640-3499-99c5-ecba75f2b444</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>50adaced-22da-3d7f-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>44697bc9-0074-33f3-860c-ee8dde3a9e36</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>failure</selectedRelationships>
+                    <source>
+                        <groupId>332ebba2-7328-32a4-0000-000000000000</groupId>
+                        <id>a5d769a2-b82b-3a8c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>a5d769a2-b82b-3a8c-8a08-1cddd5227ea5</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <funnels>
+                    <id>25dd6dd1-bb6c-34a7-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>672.0</x>
+                        <y>752.0</y>
+                    </position>
+                    <versionedComponentId>6e5597ea-8b21-3e63-abb5-9d708d169966</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>4e392470-1b83-3af6-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>56.0</x>
+                        <y>216.0</y>
+                    </position>
+                    <versionedComponentId>002575ed-b39c-399a-bfe6-87c49768f832</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>50adaced-22da-3d7f-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1160.0</x>
+                        <y>1024.0</y>
+                    </position>
+                    <versionedComponentId>44697bc9-0074-33f3-860c-ee8dde3a9e36</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>7deaef0c-3b1d-3b4c-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1552.0</x>
+                        <y>528.0</y>
+                    </position>
+                    <versionedComponentId>e0574128-6705-35d9-8594-3e151c7a2808</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>b5944ab0-dd82-3a2a-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1288.0</x>
+                        <y>224.0</y>
+                    </position>
+                    <versionedComponentId>d724da99-847a-33e7-837c-a1c1c6f867b0</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>b68a5513-f35d-3bdc-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1000.0</x>
+                        <y>240.0</y>
+                    </position>
+                    <versionedComponentId>a2bd666e-de73-3939-88d9-b72d26899c0b</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>db7881d5-ea8d-3740-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-208.0</x>
+                        <y>568.0</y>
+                    </position>
+                    <versionedComponentId>be3ff68a-941d-3f54-9b15-b717a4163a8d</versionedComponentId>
+                </funnels>
+                <outputPorts>
+                    <id>902f3a17-ca54-3c23-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>592.0</x>
+                        <y>1032.0</y>
+                    </position>
+                    <versionedComponentId>b8dbafc0-acb6-339b-8234-cba556d66457</versionedComponentId>
+                    <comments></comments>
+                    <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                    <name>FlickrPrepPdDF</name>
+                    <state>STOPPED</state>
+                    <type>OUTPUT_PORT</type>
+                </outputPorts>
+                <processors>
+                    <id>15a84e17-ceee-31fb-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-128.0</x>
+                        <y>344.0</y>
+                    </position>
+                    <versionedComponentId>ede1f438-3eee-31a4-b9fa-6a9d9bf8a9de</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Flickr Captions Source Path</key>
+<value>
+    <name>Flickr Captions Source Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Image ID Mappings to Captions Destination Path</key>
+<value>
+    <name>Image ID Mappings to Captions Destination Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Mapped Image IDs to Captions</key>
+<value>
+    <name>Already Mapped Image IDs to Captions</name>
+</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>
+    <name>JPEG Dataset Name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Flickr Captions Source Path</key>
+<value>/home/bizon/src/datasets/flickr8k/captions.txt</value>
+                            </entry>
+                            <entry>
+<key>Image ID Mappings to Captions Destination Path</key>
+<value>/home/bizon/src/datasets/flickr8k_NiFi/map_imgids_to_captions</value>
+                            </entry>
+                            <entry>
+<key>Already Mapped Image IDs to Captions</key>
+<value>False</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>MapImageIDsToCaptions</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.MapImageIDsToCaptions</type>
+                </processors>
+                <processors>
+                    <id>1e0c7f23-c2a0-3c52-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>80.0</x>
+                        <y>560.0</y>
+                    </position>
+                    <versionedComponentId>d00e71d8-79f1-3cb3-89f2-1d8847794c3e</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Preprocessed Captions Destination Path</key>
+<value>
+    <name>Preprocessed Captions Destination Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Preprocessed Captions</key>
+<value>
+    <name>Already Preprocessed Captions</name>
+</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>
+    <name>JPEG Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Delete Caption Characters Pattern</key>
+<value>
+    <name>Delete Caption Characters Pattern</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Preprocessed Captions Destination Path</key>
+<value>/home/bizon/src/datasets/flickr8k_NiFi/map_imgids_to_prep_captions</value>
+                            </entry>
+                            <entry>
+<key>Already Preprocessed Captions</key>
+<value>False</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                            <entry>
+<key>Delete Caption Characters Pattern</key>
+<value>[^A-Za-z]</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PreprocessCaptionsForTorch</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.PreprocessCaptionsForTorch</type>
+                </processors>
+                <processors>
+                    <id>4a155348-0f0c-34ac-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>952.0</x>
+                        <y>784.0</y>
+                    </position>
+                    <versionedComponentId>3e1d86ca-24dc-39d8-bfee-e304fc578245</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-update-attribute-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Delete Attributes Expression</key>
+<value>
+    <name>Delete Attributes Expression</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Store State</key>
+<value>
+    <name>Store State</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Stateful Variables Initial Value</key>
+<value>
+    <name>Stateful Variables Initial Value</name>
+</value>
+                            </entry>
+                            <entry>
+<key>canonical-value-lookup-cache-size</key>
+<value>
+    <name>canonical-value-lookup-cache-size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>pandas_df_name</key>
+<value>
+    <name>pandas_df_name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Delete Attributes Expression</key>
+                            </entry>
+                            <entry>
+<key>Store State</key>
+<value>Do not store state</value>
+                            </entry>
+                            <entry>
+<key>Stateful Variables Initial Value</key>
+                            </entry>
+                            <entry>
+<key>canonical-value-lookup-cache-size</key>
+<value>100</value>
+                            </entry>
+                            <entry>
+<key>pandas_df_name</key>
+<value>map_imgid_to_fets</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>UpdateAttribute</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.attributes.UpdateAttribute</type>
+                </processors>
+                <processors>
+                    <id>4b5396a6-7dda-3df1-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>936.0</x>
+                        <y>552.0</y>
+                    </position>
+                    <versionedComponentId>bac2b0ad-1cda-38d8-9563-11c2ca3b27e0</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Image ID Mappings to Extracted Features Destination Path</key>
+<value>
+    <name>Image ID Mappings to Extracted Features Destination Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Mapped Image IDs to Extracted Features</key>
+<value>
+    <name>Already Mapped Image IDs to Extracted Features</name>
+</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>
+    <name>JPEG Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>PyTorch CNN Model</key>
+<value>
+    <name>PyTorch CNN Model</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Image ID Mappings to Extracted Features Destination Path</key>
+<value>/home/bizon/src/datasets/flickr8k_NiFi/map_imgids_to_features</value>
+                            </entry>
+                            <entry>
+<key>Already Mapped Image IDs to Extracted Features</key>
+<value>False</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                            <entry>
+<key>PyTorch CNN Model</key>
+<value>resnet50</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>MapImageIDsToExtFeatures</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.MapImageIDsToExtFeatures</type>
+                </processors>
+                <processors>
+                    <id>626ab7ed-9331-3f96-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1104.0</x>
+                        <y>336.0</y>
+                    </position>
+                    <versionedComponentId>4409396e-0e85-33d3-8031-5fe7d51a1e81</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Preprocessed Torch Images Destination Path</key>
+<value>
+    <name>Preprocessed Torch Images Destination Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Preprocessed Torch Images</key>
+<value>
+    <name>Already Preprocessed Torch Images</name>
+</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>
+    <name>JPEG Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Resize</key>
+<value>
+    <name>Resize</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Center Crop</key>
+<value>
+    <name>Center Crop</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Mean &amp; Std Dev Normalization</key>
+<value>
+    <name>Mean &amp; Std Dev Normalization</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Preprocessed Torch Images Destination Path</key>
+<value>/home/bizon/src/datasets/flickr8k_NiFi/prep_torch_images</value>
+                            </entry>
+                            <entry>
+<key>Already Preprocessed Torch Images</key>
+<value>False</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                            <entry>
+<key>Resize</key>
+<value>256</value>
+                            </entry>
+                            <entry>
+<key>Center Crop</key>
+<value>224</value>
+                            </entry>
+                            <entry>
+<key>Mean &amp; Std Dev Normalization</key>
+<value>{"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PreprocessImagesForTorch</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.PreprocessImagesForTorch</type>
+                </processors>
+                <processors>
+                    <id>8e7c0071-4136-30e4-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>496.0</x>
+                        <y>344.0</y>
+                    </position>
+                    <versionedComponentId>16745e97-9797-3fd9-bdc4-e4cb57123f80</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Flickr Dataset Source Path</key>
+<value>
+    <name>Flickr Dataset Source Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Flickr Dataset Source Path</key>
+<value>/home/bizon/src/datasets/flickr8k/images</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GetFlickrJpegFiles</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.GetFlickrJpegFiles</type>
+                </processors>
+                <processors>
+                    <id>8f971560-b8ce-3927-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>72.0</x>
+                        <y>784.0</y>
+                    </position>
+                    <versionedComponentId>7e516c4a-8090-3eba-ad54-bd0d3a15500f</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-update-attribute-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Delete Attributes Expression</key>
+<value>
+    <name>Delete Attributes Expression</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Store State</key>
+<value>
+    <name>Store State</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Stateful Variables Initial Value</key>
+<value>
+    <name>Stateful Variables Initial Value</name>
+</value>
+                            </entry>
+                            <entry>
+<key>canonical-value-lookup-cache-size</key>
+<value>
+    <name>canonical-value-lookup-cache-size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>pandas_df_name</key>
+<value>
+    <name>pandas_df_name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Delete Attributes Expression</key>
+                            </entry>
+                            <entry>
+<key>Store State</key>
+<value>Do not store state</value>
+                            </entry>
+                            <entry>
+<key>Stateful Variables Initial Value</key>
+                            </entry>
+                            <entry>
+<key>canonical-value-lookup-cache-size</key>
+<value>100</value>
+                            </entry>
+                            <entry>
+<key>pandas_df_name</key>
+<value>map_imgid_to_caps</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>UpdateAttribute</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.attributes.UpdateAttribute</type>
+                </processors>
+                <processors>
+                    <id>a5d769a2-b82b-3a8c-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>528.0</x>
+                        <y>840.0</y>
+                    </position>
+                    <versionedComponentId>a5d769a2-b82b-3a8c-8a08-1cddd5227ea5</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Join DataFrames On Column</key>
+<value>
+    <name>Join DataFrames On Column</name>
+</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>
+    <name>JPEG Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Pandas DataFrame Name1</key>
+<value>
+    <name>Pandas DataFrame Name1</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Pandas DataFrame Name2</key>
+<value>
+    <name>Pandas DataFrame Name2</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Join DataFrames On Column</key>
+<value>natural_image</value>
+                            </entry>
+                            <entry>
+<key>JPEG Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                            <entry>
+<key>Pandas DataFrame Name1</key>
+<value>map_imgid_to_caps</value>
+                            </entry>
+                            <entry>
+<key>Pandas DataFrame Name2</key>
+<value>map_imgid_to_fets</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>JoinPdDataFrame</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.JoinPdDataFrame</type>
+                </processors>
+                <processors>
+                    <id>bca9e07e-3e81-3909-0000-000000000000</id>
+                    <parentGroupId>332ebba2-7328-32a4-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>504.0</x>
+                        <y>128.0</y>
+                    </position>
+                    <bundle>
+                        <artifact>nifi-standard-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>File Size</key>
+<value>
+    <name>File Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>
+    <name>Batch Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>
+    <name>Data Format</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>
+    <name>Unique FlowFiles</name>
+</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>
+    <name>generate-ff-custom-text</name>
+</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>
+    <name>character-set</name>
+</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+<value>
+    <name>mime-type</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>File Size</key>
+<value>0B</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>Text</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>false</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>{"HOME_DIR":"/home/bizon"}</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>UTF-8</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>1 min</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GenerateFlickrConfig</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.standard.GenerateFlowFile</type>
+                </processors>
+            </contents>
+            <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
+            <defaultBackPressureObjectThreshold>10000</defaultBackPressureObjectThreshold>
+            <defaultFlowFileExpiration>0 sec</defaultFlowFileExpiration>
+            <flowfileConcurrency>UNBOUNDED</flowfileConcurrency>
+            <flowfileOutboundPolicy>STREAM_WHEN_AVAILABLE</flowfileOutboundPolicy>
+            <name>DataPrepFlickrImageCaption</name>
+            <variables/>
+        </processGroups>
+        <processGroups>
+            <id>404b9cb1-6b98-355e-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <position>
+                <x>864.0</x>
+                <y>288.0</y>
+            </position>
+            <versionedComponentId>404b9cb1-6b98-355e-9ed5-2837c86dbeb7</versionedComponentId>
+            <comments></comments>
+            <contents>
+                <connections>
+                    <id>1dbdeecf-437a-3b78-0000-000000000000</id>
+                    <parentGroupId>404b9cb1-6b98-355e-0000-000000000000</parentGroupId>
+                    <versionedComponentId>519a7a2f-fe81-3e25-961c-8ffbfea828cb</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>404b9cb1-6b98-355e-0000-000000000000</groupId>
+                        <id>d26c7410-483b-30c0-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>b27e6d2f-6a9e-37e7-bff0-59d54273e46e</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <source>
+                        <groupId>404b9cb1-6b98-355e-0000-000000000000</groupId>
+                        <id>be54120e-f5d5-340a-0000-000000000000</id>
+                        <type>INPUT_PORT</type>
+                        <versionedComponentId>a8984837-45ee-3ba2-8c7b-2a412a25a0b1</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>d1e14531-e1a7-355d-0000-000000000000</id>
+                    <parentGroupId>404b9cb1-6b98-355e-0000-000000000000</parentGroupId>
+                    <versionedComponentId>424be011-00e8-3f36-b4bc-1a026400c5e3</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>404b9cb1-6b98-355e-0000-000000000000</groupId>
+                        <id>461c7466-075f-325e-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>2351a077-c8c4-347d-a1a5-101a97be315d</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>404b9cb1-6b98-355e-0000-000000000000</groupId>
+                        <id>d26c7410-483b-30c0-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>b27e6d2f-6a9e-37e7-bff0-59d54273e46e</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <inputPorts>
+                    <id>be54120e-f5d5-340a-0000-000000000000</id>
+                    <parentGroupId>404b9cb1-6b98-355e-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>432.0</x>
+                        <y>200.0</y>
+                    </position>
+                    <versionedComponentId>a8984837-45ee-3ba2-8c7b-2a412a25a0b1</versionedComponentId>
+                    <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                    <name>FlickrPrepPdDF</name>
+                    <state>STOPPED</state>
+                    <type>INPUT_PORT</type>
+                </inputPorts>
+                <processors>
+                    <id>461c7466-075f-325e-0000-000000000000</id>
+                    <parentGroupId>404b9cb1-6b98-355e-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1208.0</x>
+                        <y>352.0</y>
+                    </position>
+                    <versionedComponentId>2351a077-c8c4-347d-a1a5-101a97be315d</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-standard-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Directory</key>
+<value>
+    <name>Directory</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Conflict Resolution Strategy</key>
+<value>
+    <name>Conflict Resolution Strategy</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Create Missing Directories</key>
+<value>
+    <name>Create Missing Directories</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Maximum File Count</key>
+<value>
+    <name>Maximum File Count</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Last Modified Time</key>
+<value>
+    <name>Last Modified Time</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Permissions</key>
+<value>
+    <name>Permissions</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Owner</key>
+<value>
+    <name>Owner</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Group</key>
+<value>
+    <name>Group</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Directory</key>
+<value>/home/bizon/src/datasets/flickr_NiFi/zmq_pub_prep_bytes</value>
+                            </entry>
+                            <entry>
+<key>Conflict Resolution Strategy</key>
+<value>replace</value>
+                            </entry>
+                            <entry>
+<key>Create Missing Directories</key>
+<value>true</value>
+                            </entry>
+                            <entry>
+<key>Maximum File Count</key>
+                            </entry>
+                            <entry>
+<key>Last Modified Time</key>
+                            </entry>
+                            <entry>
+<key>Permissions</key>
+                            </entry>
+                            <entry>
+<key>Owner</key>
+                            </entry>
+                            <entry>
+<key>Group</key>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PutFile</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.standard.PutFile</type>
+                </processors>
+                <processors>
+                    <id>d26c7410-483b-30c0-0000-000000000000</id>
+                    <parentGroupId>404b9cb1-6b98-355e-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>584.0</x>
+                        <y>344.0</y>
+                    </position>
+                    <versionedComponentId>b27e6d2f-6a9e-37e7-bff0-59d54273e46e</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ZMQ Socket Address</key>
+<value>
+    <name>ZMQ Socket Address</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Dataset Name</key>
+<value>
+    <name>Dataset Name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ZMQ Socket Address</key>
+<value>tcp://127.0.0.1:5556</value>
+                            </entry>
+                            <entry>
+<key>Dataset Name</key>
+<value>flickr</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PutZMQ</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.PutZMQ</type>
+                </processors>
+            </contents>
+            <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
+            <defaultBackPressureObjectThreshold>10000</defaultBackPressureObjectThreshold>
+            <defaultFlowFileExpiration>0 sec</defaultFlowFileExpiration>
+            <flowfileConcurrency>UNBOUNDED</flowfileConcurrency>
+            <flowfileOutboundPolicy>STREAM_WHEN_AVAILABLE</flowfileOutboundPolicy>
+            <name>FlickrTrainingPipeline</name>
+            <variables/>
+        </processGroups>
+        <processGroups>
+            <id>4188e8ec-957d-3d25-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <position>
+                <x>384.0</x>
+                <y>296.0</y>
+            </position>
+            <versionedComponentId>4188e8ec-957d-3d25-ab7d-e1bf8e3b3b29</versionedComponentId>
+            <comments></comments>
+            <contents>
+                <connections>
+                    <id>1bd9b63e-4913-3e3e-0000-000000000000</id>
+                    <parentGroupId>4188e8ec-957d-3d25-0000-000000000000</parentGroupId>
+                    <versionedComponentId>1bd9b63e-4913-3e3e-a01b-da64e8cc17fc</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>4188e8ec-957d-3d25-0000-000000000000</groupId>
+                        <id>6ed6dc60-8f3f-3087-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>6ed6dc60-8f3f-3087-bcb3-07ebc4df6dbd</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <source>
+                        <groupId>4188e8ec-957d-3d25-0000-000000000000</groupId>
+                        <id>93301b03-91e2-3b77-0000-000000000000</id>
+                        <type>INPUT_PORT</type>
+                        <versionedComponentId>fead95a1-1bb7-3c37-bdad-36eda1260bfc</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>e6558c71-9346-368e-0000-000000000000</id>
+                    <parentGroupId>4188e8ec-957d-3d25-0000-000000000000</parentGroupId>
+                    <versionedComponentId>e6558c71-9346-368e-a2e2-908f66fb7459</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>4188e8ec-957d-3d25-0000-000000000000</groupId>
+                        <id>170facf3-e79e-3b3c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>fa1058f1-a3d5-3c6f-a333-45ca9c9c85a6</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>4188e8ec-957d-3d25-0000-000000000000</groupId>
+                        <id>6ed6dc60-8f3f-3087-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>6ed6dc60-8f3f-3087-bcb3-07ebc4df6dbd</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <inputPorts>
+                    <id>93301b03-91e2-3b77-0000-000000000000</id>
+                    <parentGroupId>4188e8ec-957d-3d25-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-1147.1565547128926</x>
+                        <y>-381.75514626218853</y>
+                    </position>
+                    <versionedComponentId>fead95a1-1bb7-3c37-bdad-36eda1260bfc</versionedComponentId>
+                    <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                    <name>NFBSPreppedPdDataFrame</name>
+                    <state>STOPPED</state>
+                    <type>INPUT_PORT</type>
+                </inputPorts>
+                <processors>
+                    <id>170facf3-e79e-3b3c-0000-000000000000</id>
+                    <parentGroupId>4188e8ec-957d-3d25-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-360.0</x>
+                        <y>-192.0</y>
+                    </position>
+                    <versionedComponentId>fa1058f1-a3d5-3c6f-a333-45ca9c9c85a6</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-standard-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>Directory</key>
+<value>
+    <name>Directory</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Conflict Resolution Strategy</key>
+<value>
+    <name>Conflict Resolution Strategy</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Create Missing Directories</key>
+<value>
+    <name>Create Missing Directories</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Maximum File Count</key>
+<value>
+    <name>Maximum File Count</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Last Modified Time</key>
+<value>
+    <name>Last Modified Time</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Permissions</key>
+<value>
+    <name>Permissions</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Owner</key>
+<value>
+    <name>Owner</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Group</key>
+<value>
+    <name>Group</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>Directory</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/zmq_pub_prepped_bytes</value>
+                            </entry>
+                            <entry>
+<key>Conflict Resolution Strategy</key>
+<value>replace</value>
+                            </entry>
+                            <entry>
+<key>Create Missing Directories</key>
+<value>true</value>
+                            </entry>
+                            <entry>
+<key>Maximum File Count</key>
+                            </entry>
+                            <entry>
+<key>Last Modified Time</key>
+                            </entry>
+                            <entry>
+<key>Permissions</key>
+                            </entry>
+                            <entry>
+<key>Owner</key>
+                            </entry>
+                            <entry>
+<key>Group</key>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PutFile</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.standard.PutFile</type>
+                </processors>
+                <processors>
+                    <id>6ed6dc60-8f3f-3087-0000-000000000000</id>
+                    <parentGroupId>4188e8ec-957d-3d25-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-992.0</x>
+                        <y>-232.0</y>
+                    </position>
+                    <versionedComponentId>6ed6dc60-8f3f-3087-bcb3-07ebc4df6dbd</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ZMQ Socket Address</key>
+<value>
+    <name>ZMQ Socket Address</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Dataset Name</key>
+<value>
+    <name>Dataset Name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ZMQ Socket Address</key>
+<value>tcp://127.0.0.1:5555</value>
+                            </entry>
+                            <entry>
+<key>Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>PutZMQ</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.PutZMQ</type>
+                </processors>
+            </contents>
+            <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
+            <defaultBackPressureObjectThreshold>10000</defaultBackPressureObjectThreshold>
+            <defaultFlowFileExpiration>0 sec</defaultFlowFileExpiration>
+            <flowfileConcurrency>UNBOUNDED</flowfileConcurrency>
+            <flowfileOutboundPolicy>STREAM_WHEN_AVAILABLE</flowfileOutboundPolicy>
+            <name>NFBSTrainingPipeline</name>
+            <variables/>
+        </processGroups>
+        <processGroups>
+            <id>a36b5e83-2296-3ed7-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <position>
+                <x>0.0</x>
+                <y>0.0</y>
+            </position>
+            <versionedComponentId>a36b5e83-2296-3ed7-bd9c-a222ace0c50a</versionedComponentId>
+            <comments></comments>
+            <contents>
+                <connections>
+                    <id>2f68b919-cd8d-3320-0000-000000000000</id>
+                    <parentGroupId>a36b5e83-2296-3ed7-0000-000000000000</parentGroupId>
+                    <versionedComponentId>7d48f73c-53e1-370d-a01d-4f59282bb03f</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>a36b5e83-2296-3ed7-0000-000000000000</groupId>
+                        <id>b901da70-ba65-3c7c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>fce9ac70-2828-3e6c-8e0a-5d34ab818264</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>a36b5e83-2296-3ed7-0000-000000000000</groupId>
+                        <id>166eab4b-54b9-32ae-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>c6f2307f-4a03-3b04-97a0-ca3a869ae27c</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>6b31af59-ac3c-3ab6-0000-000000000000</id>
+                    <parentGroupId>a36b5e83-2296-3ed7-0000-000000000000</parentGroupId>
+                    <versionedComponentId>8afa0d81-4a11-3bb6-b745-45ee4bb802a0</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>a36b5e83-2296-3ed7-0000-000000000000</groupId>
+                        <id>1a6441dc-d79e-3443-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>4e3b4c8a-ef77-3dbc-89f8-9e32993cbf55</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>a36b5e83-2296-3ed7-0000-000000000000</groupId>
+                        <id>b901da70-ba65-3c7c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>fce9ac70-2828-3e6c-8e0a-5d34ab818264</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <funnels>
+                    <id>1a6441dc-d79e-3443-0000-000000000000</id>
+                    <parentGroupId>a36b5e83-2296-3ed7-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-200.0</x>
+                        <y>72.0</y>
+                    </position>
+                    <versionedComponentId>4e3b4c8a-ef77-3dbc-89f8-9e32993cbf55</versionedComponentId>
+                </funnels>
+                <processors>
+                    <id>166eab4b-54b9-32ae-0000-000000000000</id>
+                    <parentGroupId>a36b5e83-2296-3ed7-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-344.0</x>
+                        <y>-352.0</y>
+                    </position>
+                    <versionedComponentId>c6f2307f-4a03-3b04-97a0-ca3a869ae27c</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-standard-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>File Size</key>
+<value>
+    <name>File Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>
+    <name>Batch Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>
+    <name>Data Format</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>
+    <name>Unique FlowFiles</name>
+</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>
+    <name>generate-ff-custom-text</name>
+</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>
+    <name>character-set</name>
+</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+<value>
+    <name>mime-type</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>File Size</key>
+<value>0B</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>Text</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>false</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>/media/james/ai_projects/data/ICPSR_38464_Stroke_Data/MRI-DS-1-48</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>UTF-8</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>1 min</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GenerateICPSRConfig</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.standard.GenerateFlowFile</type>
+                </processors>
+                <processors>
+                    <id>b901da70-ba65-3c7c-0000-000000000000</id>
+                    <parentGroupId>a36b5e83-2296-3ed7-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>-352.0</x>
+                        <y>-144.0</y>
+                    </position>
+                    <versionedComponentId>fce9ac70-2828-3e6c-8e0a-5d34ab818264</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ICPSR38464 Dataset Base Path</key>
+<value>
+    <name>ICPSR38464 Dataset Base Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ICPSR38464 Dataset Base Path</key>
+<value>/media/james/ai_projects/data/ICPSR_38464_Stroke_Data/MRI-DS-1-48</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GetICPSR38464NIfTIFiles</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.GetICPSR38464NIfTIFiles</type>
+                </processors>
+            </contents>
+            <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
+            <defaultBackPressureObjectThreshold>10000</defaultBackPressureObjectThreshold>
+            <defaultFlowFileExpiration>0 sec</defaultFlowFileExpiration>
+            <flowfileConcurrency>UNBOUNDED</flowfileConcurrency>
+            <flowfileOutboundPolicy>STREAM_WHEN_AVAILABLE</flowfileOutboundPolicy>
+            <name>DataPrepICPSRSkullStrip</name>
+            <variables/>
+        </processGroups>
+        <processGroups>
+            <id>e2632504-4084-3f4a-0000-000000000000</id>
+            <parentGroupId>11542854-4467-36f5-0000-000000000000</parentGroupId>
+            <position>
+                <x>424.0</x>
+                <y>0.0</y>
+            </position>
+            <versionedComponentId>e2632504-4084-3f4a-add0-46a6a095007f</versionedComponentId>
+            <comments></comments>
+            <contents>
+                <connections>
+                    <id>01de5acd-1a5c-3d08-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>0a19a57c-e480-3206-965b-618cb306ff3e</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>4e36dc17-f74b-3646-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>dd691146-ca99-32d4-8a03-558d3dc40689</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>c55a01fd-31ae-3cb5-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>238b9315-c259-313b-8bc3-9128321a9b2a</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>0baac250-e5a4-3cd5-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>2ed53b98-7b87-31d8-8cf8-0a8b7df5053b</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>92431ca0-38ab-31cc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>0ed20713-5fcf-38da-8f7b-a2102ff57592</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>9fc8d43d-abaf-3d40-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>58d30494-b202-3665-b48d-79aa1131b17c</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>2092fc77-bb95-33bc-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>e94bbf41-7416-36fc-a832-fc2180505a11</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>934192bd-3aa8-3289-0000-000000000000</id>
+                        <type>OUTPUT_PORT</type>
+                        <versionedComponentId>a43b5ca4-b79e-337f-bacf-8ff73c88a599</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>67d212cf-f9d6-37fc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>e10a4432-5ec0-3811-a844-aa0d22f49229</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>2b50e695-7f3d-3bf7-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>7ee3dbb0-58eb-31e7-be96-5dc08c29ff70</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>ee5ac8ec-1c02-3f74-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>5ace5059-da9b-36f0-a5c2-74deea769f99</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>eeb65235-6199-3a9a-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>6fc85ccd-da3f-3bf2-8bd8-1d03bb64e86e</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>2d797320-2e29-30e9-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>a19f33f6-bab7-3ae3-a642-574611920bdc</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>eeb65235-6199-3a9a-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>6fc85ccd-da3f-3bf2-8bd8-1d03bb64e86e</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>86eafc0e-b266-3930-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>143f5573-93ea-3988-a08a-62582762cee5</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>4e430e5a-9878-3f4d-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>57cd1812-2b62-31e6-9a20-02d2af93d4b7</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>9fc8d43d-abaf-3d40-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>58d30494-b202-3665-b48d-79aa1131b17c</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>86eafc0e-b266-3930-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>143f5573-93ea-3988-a08a-62582762cee5</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>53b76c05-d06f-38b3-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>36b8acc8-739e-3529-9eaf-7dbf81a3db90</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>67d212cf-f9d6-37fc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>e10a4432-5ec0-3811-a844-aa0d22f49229</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>92431ca0-38ab-31cc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>0ed20713-5fcf-38da-8f7b-a2102ff57592</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>707d479c-ca50-3014-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>a740a480-2bf4-3449-b42e-4f6b39939fa3</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>cd3ebd89-f781-3db1-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>2d7f4fc0-4af9-3f99-8940-2f0d78662faf</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>67d212cf-f9d6-37fc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>e10a4432-5ec0-3811-a844-aa0d22f49229</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>8aa90a0c-c4f8-3ec5-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>401d9f84-85a7-37b5-ade0-62d80b5cb6da</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>ebfa9113-0d52-389c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>1c028cdf-0f06-32db-9681-b96047b8a4dc</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>92431ca0-38ab-31cc-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>0ed20713-5fcf-38da-8f7b-a2102ff57592</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>903e9639-345d-3b72-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>dd1b4619-70db-3ece-adce-12ce459269e7</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>c55a01fd-31ae-3cb5-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>238b9315-c259-313b-8bc3-9128321a9b2a</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>9fc8d43d-abaf-3d40-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>58d30494-b202-3665-b48d-79aa1131b17c</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>9e19d4e9-80cd-37db-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>8f9a15e6-b51a-38fe-a903-0079d58d5561</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>027bb4f3-9771-388f-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>0c52f47d-9822-3a2a-a0ea-6bd698c0c797</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>cd3ebd89-f781-3db1-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>2d7f4fc0-4af9-3f99-8940-2f0d78662faf</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>aa9fb687-33a0-322d-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>e1437b41-92ed-37df-a249-65f62f041cce</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>86eafc0e-b266-3930-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>143f5573-93ea-3988-a08a-62582762cee5</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>e3b34102-c6c2-3d67-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>febdbbd2-8e77-3d4c-a3a9-025990926c5b</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <connections>
+                    <id>f4915244-d5dd-3133-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <versionedComponentId>69d2ca8e-83f1-3ab3-a971-ae3803874cdd</versionedComponentId>
+                    <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+                    <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+                    <destination>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>e6e931c8-a31c-3bba-0000-000000000000</id>
+                        <type>FUNNEL</type>
+                        <versionedComponentId>1f7a9fc7-e968-32ce-9290-cee5e020cc59</versionedComponentId>
+                    </destination>
+                    <flowFileExpiration>0 sec</flowFileExpiration>
+                    <labelIndex>1</labelIndex>
+                    <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+                    <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+                    <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+                    <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+                    <name></name>
+                    <selectedRelationships>success</selectedRelationships>
+                    <source>
+                        <groupId>e2632504-4084-3f4a-0000-000000000000</groupId>
+                        <id>ebfa9113-0d52-389c-0000-000000000000</id>
+                        <type>PROCESSOR</type>
+                        <versionedComponentId>1c028cdf-0f06-32db-9681-b96047b8a4dc</versionedComponentId>
+                    </source>
+                    <zIndex>0</zIndex>
+                </connections>
+                <funnels>
+                    <id>027bb4f3-9771-388f-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1904.0</x>
+                        <y>600.0</y>
+                    </position>
+                    <versionedComponentId>0c52f47d-9822-3a2a-a0ea-6bd698c0c797</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>4e36dc17-f74b-3646-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1464.0</x>
+                        <y>160.0</y>
+                    </position>
+                    <versionedComponentId>dd691146-ca99-32d4-8a03-558d3dc40689</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>e6e931c8-a31c-3bba-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1704.0</x>
+                        <y>384.0</y>
+                    </position>
+                    <versionedComponentId>1f7a9fc7-e968-32ce-9290-cee5e020cc59</versionedComponentId>
+                </funnels>
+                <funnels>
+                    <id>ee5ac8ec-1c02-3f74-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1280.0</x>
+                        <y>-64.0</y>
+                    </position>
+                    <versionedComponentId>5ace5059-da9b-36f0-a5c2-74deea769f99</versionedComponentId>
+                </funnels>
+                <outputPorts>
+                    <id>934192bd-3aa8-3289-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1040.0</x>
+                        <y>952.0</y>
+                    </position>
+                    <versionedComponentId>a43b5ca4-b79e-337f-bacf-8ff73c88a599</versionedComponentId>
+                    <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                    <name>NFBSPreppedPdDataFrame</name>
+                    <state>STOPPED</state>
+                    <type>OUTPUT_PORT</type>
+                </outputPorts>
+                <processors>
+                    <id>67d212cf-f9d6-37fc-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>904.0</x>
+                        <y>736.0</y>
+                    </position>
+                    <versionedComponentId>e10a4432-5ec0-3811-a844-aa0d22f49229</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ITK Intensity Normalized Folder Path</key>
+<value>
+    <name>ITK Intensity Normalized Folder Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Intensity Normalized</key>
+<value>
+    <name>Already Intensity Normalized</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ITK Intensity Normalized Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/intensity_norm</value>
+                            </entry>
+                            <entry>
+<key>Already Intensity Normalized</key>
+<value>False</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>NormalizeIntensityInITKImage</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.NormalizeIntensityInITKImage</type>
+                </processors>
+                <processors>
+                    <id>86eafc0e-b266-3930-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>280.0</x>
+                        <y>16.0</y>
+                    </position>
+                    <versionedComponentId>143f5573-93ea-3988-a08a-62582762cee5</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>NFBS Dataset Base Path</key>
+<value>
+    <name>NFBS Dataset Base Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>NFBS Dataset Base Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GetNFBSNIfTIFiles</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.GetNFBSNIfTIFiles</type>
+                </processors>
+                <processors>
+                    <id>92431ca0-38ab-31cc-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>736.0</x>
+                        <y>504.0</y>
+                    </position>
+                    <versionedComponentId>0ed20713-5fcf-38da-8f7b-a2102ff57592</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ITK Resized Cropped Folder Path</key>
+<value>
+    <name>ITK Resized Cropped Folder Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Resized Cropped</key>
+<value>
+    <name>Already Resized Cropped</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Resize Spacing Resolution</key>
+<value>
+    <name>Resize Spacing Resolution</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Resize Crop Target Dimensions</key>
+<value>
+    <name>Resize Crop Target Dimensions</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ITK Resized Cropped Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/resized_cropped</value>
+                            </entry>
+                            <entry>
+<key>Already Resized Cropped</key>
+<value>True</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                            <entry>
+<key>Resize Spacing Resolution</key>
+<value>2.2</value>
+                            </entry>
+                            <entry>
+<key>Resize Crop Target Dimensions</key>
+<value>{"width": 160, "height": 128, "depth": 96}</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>ResizeCropITKImage</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.ResizeCropITKImage</type>
+                </processors>
+                <processors>
+                    <id>9fc8d43d-abaf-3d40-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>408.0</x>
+                        <y>264.0</y>
+                    </position>
+                    <versionedComponentId>58d30494-b202-3665-b48d-79aa1131b17c</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>ITK Bias Correction Folder Path</key>
+<value>
+    <name>ITK Bias Correction Folder Path</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Already Corrected Bias Field</key>
+<value>
+    <name>Already Corrected Bias Field</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>ITK Bias Correction Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/bias_correction</value>
+                            </entry>
+                            <entry>
+<key>Already Corrected Bias Field</key>
+<value>True</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>CorrectBiasFieldInITKImage</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.CorrectBiasFieldInITKImage</type>
+                </processors>
+                <processors>
+                    <id>c55a01fd-31ae-3cb5-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1120.0</x>
+                        <y>288.0</y>
+                    </position>
+                    <versionedComponentId>238b9315-c259-313b-8bc3-9128321a9b2a</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>NifTI File Index</key>
+<value>
+    <name>NifTI File Index</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>
+    <name>NifTI 2D Slice Image Divisor</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>
+    <name>NifTI CSV Column Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>
+    <name>Saved ITK Image Folder Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>NifTI File Index</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>2</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>correct_bias</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/image_slices/correct_bias</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>SaveITKImageSlice</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.SaveITKImageSlice</type>
+                </processors>
+                <processors>
+                    <id>cd3ebd89-f781-3db1-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1584.0</x>
+                        <y>760.0</y>
+                    </position>
+                    <versionedComponentId>2d7f4fc0-4af9-3f99-8940-2f0d78662faf</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>NifTI File Index</key>
+<value>
+    <name>NifTI File Index</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>
+    <name>NifTI 2D Slice Image Divisor</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>
+    <name>NifTI CSV Column Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>
+    <name>Saved ITK Image Folder Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>NifTI File Index</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>2</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>intensity_norm</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/image_slices/intensity_norm</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>SaveITKImageSlice</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.SaveITKImageSlice</type>
+                </processors>
+                <processors>
+                    <id>e3b34102-c6c2-3d67-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>216.0</x>
+                        <y>-208.0</y>
+                    </position>
+                    <versionedComponentId>febdbbd2-8e77-3d4c-a3a9-025990926c5b</versionedComponentId>
+                    <bundle>
+                        <artifact>nifi-standard-nar</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>2.0.0-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>File Size</key>
+<value>
+    <name>File Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>
+    <name>Batch Size</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>
+    <name>Data Format</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>
+    <name>Unique FlowFiles</name>
+</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>
+    <name>generate-ff-custom-text</name>
+</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>
+    <name>character-set</name>
+</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+<value>
+    <name>mime-type</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>File Size</key>
+<value>0B</value>
+                            </entry>
+                            <entry>
+<key>Batch Size</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>Data Format</key>
+<value>Text</value>
+                            </entry>
+                            <entry>
+<key>Unique FlowFiles</key>
+<value>false</value>
+                            </entry>
+                            <entry>
+<key>generate-ff-custom-text</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset</value>
+                            </entry>
+                            <entry>
+<key>character-set</key>
+<value>UTF-8</value>
+                            </entry>
+                            <entry>
+<key>mime-type</key>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>0</runDurationMillis>
+                        <schedulingPeriod>1 min</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>GenerateNFBSConfig</name>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>org.apache.nifi.processors.standard.GenerateFlowFile</type>
+                </processors>
+                <processors>
+                    <id>ebfa9113-0d52-389c-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>1416.0</x>
+                        <y>520.0</y>
+                    </position>
+                    <versionedComponentId>1c028cdf-0f06-32db-9681-b96047b8a4dc</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>NifTI File Index</key>
+<value>
+    <name>NifTI File Index</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>
+    <name>NifTI 2D Slice Image Divisor</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>
+    <name>NifTI CSV Column Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>
+    <name>Saved ITK Image Folder Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>NifTI File Index</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>2</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>resize_crop</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/image_slices/resize_crop</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>SaveITKImageSlice</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.SaveITKImageSlice</type>
+                </processors>
+                <processors>
+                    <id>eeb65235-6199-3a9a-0000-000000000000</id>
+                    <parentGroupId>e2632504-4084-3f4a-0000-000000000000</parentGroupId>
+                    <position>
+                        <x>976.0</x>
+                        <y>48.0</y>
+                    </position>
+                    <versionedComponentId>6fc85ccd-da3f-3bf2-8bd8-1d03bb64e86e</versionedComponentId>
+                    <bundle>
+                        <artifact>python-extensions</artifact>
+                        <group>org.apache.nifi</group>
+                        <version>0.0.1-SNAPSHOT</version>
+                    </bundle>
+                    <config>
+                        <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                        <bulletinLevel>WARN</bulletinLevel>
+                        <comments></comments>
+                        <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                        <descriptors>
+                            <entry>
+<key>NifTI File Index</key>
+<value>
+    <name>NifTI File Index</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>
+    <name>NifTI 2D Slice Image Divisor</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>
+    <name>NifTI Dataset Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>
+    <name>NifTI CSV Column Name</name>
+</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>
+    <name>Saved ITK Image Folder Path</name>
+</value>
+                            </entry>
+                        </descriptors>
+                        <executionNode>ALL</executionNode>
+                        <lossTolerant>false</lossTolerant>
+                        <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                        <penaltyDuration>30 sec</penaltyDuration>
+                        <properties>
+                            <entry>
+<key>NifTI File Index</key>
+<value>1</value>
+                            </entry>
+                            <entry>
+<key>NifTI 2D Slice Image Divisor</key>
+<value>2</value>
+                            </entry>
+                            <entry>
+<key>NifTI Dataset Name</key>
+<value>nfbs</value>
+                            </entry>
+                            <entry>
+<key>NifTI CSV Column Name</key>
+<value>get_nifti</value>
+                            </entry>
+                            <entry>
+<key>Saved ITK Image Folder Path</key>
+<value>/home/bizon/src/datasets/NFBS_Dataset_NiFi/image_slices/get_nifti</value>
+                            </entry>
+                        </properties>
+                        <retryCount>10</retryCount>
+                        <runDurationMillis>25</runDurationMillis>
+                        <schedulingPeriod>0 sec</schedulingPeriod>
+                        <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                        <yieldDuration>1 sec</yieldDuration>
+                    </config>
+                    <executionNodeRestricted>false</executionNodeRestricted>
+                    <name>SaveITKImageSlice</name>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>failure</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>true</autoTerminate>
+                        <name>original</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <relationships>
+                        <autoTerminate>false</autoTerminate>
+                        <name>success</name>
+                        <retry>false</retry>
+                    </relationships>
+                    <state>STOPPED</state>
+                    <style/>
+                    <type>python.SaveITKImageSlice</type>
+                </processors>
+            </contents>
+            <defaultBackPressureDataSizeThreshold>1 GB</defaultBackPressureDataSizeThreshold>
+            <defaultBackPressureObjectThreshold>10000</defaultBackPressureObjectThreshold>
+            <defaultFlowFileExpiration>0 sec</defaultFlowFileExpiration>
+            <flowfileConcurrency>UNBOUNDED</flowfileConcurrency>
+            <flowfileOutboundPolicy>STREAM_WHEN_AVAILABLE</flowfileOutboundPolicy>
+            <name>DataPrepNFBSSkullStrip</name>
+            <variables/>
+        </processGroups>
+    </snippet>
+    <timestamp>08/27/2023 21:39:07 EDT</timestamp>
+</template>
