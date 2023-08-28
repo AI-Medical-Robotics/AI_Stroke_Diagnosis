@@ -1,40 +1,74 @@
-# import modules
-import os
-import pickle
-import numpy as np
-from tqdm import tqdm
+import torch
+import torch.nn as nn
+# import statistics
+# import torchvision.models as models
 
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.models import Model
-from tensorflow.keras.utils import to_categorical, plot_model
-from tensorflow.keras.layers import Input, Dense, LSTM, Embedding, Dropout, add
+# Reference perplexity.ai:
+# https://www.perplexity.ai/search/01326834-6a79-43be-9e49-c040e0c02b66
 
-# model creation
-def cnn_lstm(caps_max_len, vocab_size):
-    # encoder model
-    # image feature layers
-    inputs1 = Input(shape=(4096,))
-    fe1 = Dropout(0.4)(inputs1)
-    fe2 = Dense(256, activation="relu")(fe1)
+# class EncoderCNN(nn.Module):
+#     def __init__(self, embed_size, train_CNN=False):
+#         super(EncoderCNN, self).__init__()
+#         self.train_CNN = train_CNN
+#         self.inception = models.inception_v3(pretrained=True, aux_logits=False)
+#         self.inception.fc = nn.Linear(self.inception.fc.in_features, embed_size)
+#         self.relu = nn.ReLU()
+#         self.times = []
+#         self.dropout = nn.Dropout(0.5)
 
-    # sequence feature layers
-    inputs2 = Input(shape=(caps_max_len,))
-    se1 = Embedding(vocab_size, 256, mask_zero=True)(inputs2)
-    se2 = Dropout(0.4)(se1)
-    se3 = LSTM(256)(se2)
+#         def forward(self, images):
+#             features = self.inception(images)
 
-    # decoder model
-    decoder1 = add([fe2, se3])
-    decoder2 = Dense(256, activation="relu")(decoder1)
-    outputs = Dense(vocab_size, activation="softmax")(decoder2)
+#             # Included following code in train.py. Which is more appropriate?
+#             for name, param in self.inception.named_parameters():
+#                 if "fc.weight" in name or "fc.bias" in name:
+#                     param.requires_grad = True
+#                 else:
+#                     param.requires_grad = self.train_CNN
 
-    model = Model(inputs=[inputs1, inputs2], outputs=outputs)
-    model.compile(loss="categorical_crossentropy", optimizer="adam")
+#             return self.dropout(self.relu(features))
 
-    # plot the model
-    plot_model(model, show_shapes=True)
+# class DecoderRNN(nn.Module):
+#     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
+#         super(DecoderRNN, self).__init()
+#         self.embed = nn.Embedding(vocab_size, embed_size)
+#         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers)
+#         self.linear = nn.Linear(hidden_size, vocab_size)
+#         self.dropout = nn.Dropout(0.5)
 
-    return model
+#     def forward(self, features, captions):
+#         embeddings = self.dropout(self.embed(captions))
+#         embeddings = torch.cat((features.unsqueeze(0), embeddings), dim=0)
+#         hiddens, _ = self.lstm(embeddings)
+#         outputs = self.linear(hiddens)
+#         return outputs
+
+class CNNtoLSTM(nn.Module):
+    def __init__(self, caps_max_len, vocab_size):
+        super(CNNtoLSTM, self).__init__()
+        
+        # Encoder model - image feature layers
+        self.fe1 = nn.Dropout(0.4)
+        self.fe2 = nn.Linear(4096, 256)
+
+        # Encoder model - sequence feature layers
+        self.se1 = nn.Embedding(vocab_size, 256, padding_idx=0)
+        self.se2 = nn.Dropout(0.4)
+        self.se3 = nn.LSTM(256, 256)
+
+        # Decoder model
+        self.decoder1 = nn.Linear(256, 256)
+        self.decoder2 = nn.Linear(256, vocab_size)
+
+    def forward(self, inputs1, inputs2):
+        fe1 = self.fe1(inputs1)
+        fe2 = self.fe2(fe1)
+
+        se1 = self.se1(inputs2)
+        se2 = self.se2(se1)
+        se3, _ = self.se3(se2)
+
+        decoder1 = torch.add(fe2, se3)
+        decoder2 = self.decoder1(decoder1)
+        outputs = self.decoder2(decoder2)
+        return outputs
