@@ -22,12 +22,17 @@ update-alternatives --list java
 # Follow the steps here to install maven
 # go: https://phoenixnap.com/kb/install-maven-on-ubuntu
 
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export M2_HOME=/opt/maven
+export MAVEN_HOME=/opt/maven
+export PATH=${M2_HOME}/bin:${PATH}
+
 source /etc/profile.d/maven.sh
 
 # conda environment path should be java_home
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 
-export PYTHON_HOME=/home/james/miniconda3/envs/stroke_ai_nifi/
+# export PYTHON_HOME=/home/james/miniconda3/envs/stroke_ai_nifi/
 
 # Environment variables:
 export MAVEN_COMMAND="./mvnw"
@@ -62,7 +67,9 @@ export MAVEN_OPTS=$COMPILE_MAVEN_OPTS
 # $MAVEN_COMMAND $MAVEN_COMPILE_COMMAND
 # $MAVEN_COMMAND $MAVEN_COMPILE_COMMAND_V2
 
-$MAVEN_COMMAND clean install -T2C
+$MAVEN_COMMAND clean install -T2C -DskipTests
+
+# $MAVEN_COMMAND $MAVEN_COMPILE_COMMAND clean install -T2C
 ~~~
 
 
