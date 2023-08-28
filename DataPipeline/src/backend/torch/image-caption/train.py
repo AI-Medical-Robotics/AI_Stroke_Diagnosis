@@ -25,29 +25,57 @@ from torch.utils.data import Dataset, DataLoader
 
 from utils import save_checkpoint, load_checkpoint, print_examples
 
-def ImgCapPrepDataset(Dataset):
-    def __init__(self, imgid_keys, imgid_cap_map, ext_features, tokenizer, caps_max_len, vocab_size):
+# Reference perplexity.ai for preparing data for pytorch and training pytorch:
+# https://www.perplexity.ai/search/b1046a4a-c702-481b-b719-ace5706e024e?s=u
+
+class ImgCapPrepDataset(Dataset):
+    def __init__(self, imgid_keys, imgid_cap_map, ext_features, tokenizer, vocab, caps_max_len, vocab_size):
         self.imgid_keys = imgid_keys
         self.imgid_cap_map = imgid_cap_map
         self.ext_features = ext_features
         self.tokenizer = tokenizer
+        self.vocab = vocab
         self.caps_max_len = caps_max_len
         self.vocab_size = vocab_size
+        self.padding_value = 0
     
     def __len__(self):
         return len(self.imgid_keys)
 
     def __getitem__(self, idx):
         img_id = self.imgid_keys[idx]
-        captions = self.imgid_cap_map[img_id]
+        captions_sample_list = self.imgid_cap_map[img_id]
+
+        print("captions_sample_list type = {}".format(type(captions_sample_list)))
 
         X1, X2, y = [], [], []
-        for caption in captions:
-            seq = self.tokenizer(caption)
+        for caption_words in captions_sample_list:
+            print("caption_words type = {}".format(type(caption_words)))
+            print("caption_words = {}".format(caption_words))
+            # flattened_captions = [caption for caption in caption_words]
+            # print("flattened_captions type = {}".format(type(flattened_captions)))
+
+            caption_word_tokens = self.tokenizer(caption_words)
+            print("caption_word_tokens type = {}".format(type(caption_word_tokens)))
+            print("caption_word_tokens = {}".format(caption_word_tokens))
+
+            seq = [self.vocab[token_str] for token_str in caption_word_tokens]
+            print("seq type = {}".format(type(seq)))
+            print("seq = {}".format(seq))
             for i in range(1, len(seq)):
                 in_seq, out_seq = seq[:i], seq[i]
-                in_seq = pad_sequence([torch.tensor(in_seq)], batch_first=True, padding_value=0)
+                print("in_seq type = {}".format(type(in_seq)))
+                print("in_seq = {}".format(in_seq))
+                # print("in_seq[0] = {}".format(in_seq[0]))
+                in_seq = torch.tensor([in_seq]) # Convert in_seq to tensor
+                # in_seq = torch.unsqueeze(in_seq, 0) # Add dim to match pad_sequence
+
+                # manually ensure all padded sequences have same length by slicing them to caps_max_len
+                in_seq = [seq[:self.caps_max_len] + [self.padding_value] * (self.caps_max_len - len(seq)) for seq in in_seq]
+                in_seq = pad_sequence(in_seq, batch_first=True, padding_value=0)[0]
+
                 out_seq = torch.tensor(out_seq)
+                out_seq = F.one_hot(out_seq, num_classes=self.vocab_size)
 
                 X1.append(self.ext_features[img_id])
                 X2.append(in_seq)
@@ -118,14 +146,14 @@ def extract_features(img_cap_csv_df):
 # TODO (JG): Update to use pytorch tokenizer
 def tokenize_captions(all_captions):
     tokenizer = get_tokenizer("basic_english")
-    tokens = tokenizer(all_captions)
-    vocab = build_vocab_from_iterator([tokens], specials=["<unk>"])
+    flattened_captions = [caption for sublist in all_captions for caption in sublist]
+    tokens = (tokenizer(caption) for caption in flattened_captions)
+    vocab = build_vocab_from_iterator(tokens, specials=["<unk>"])
     vocab_size = len(vocab)
-    # print("vocab_size = {}".format(vocab_size))
-    return tokenizer, vocab_size
+    return tokenizer, vocab, vocab_size
 
-def get_captions_max(self, all_captions):
-    return max(len(caption.split()) for caption in all_captions)
+def get_captions_max(all_captions):
+    return max(len(caption) for caption in all_captions)
 
 
 # def eval_cnn_lstm(model, results_plot_path, eval_train=True):
@@ -144,7 +172,7 @@ def train_cnn_lstm(img_cap_csv_df, batch_size = 64, save_model = True):
 
     ext_features = extract_features(img_cap_csv_df)
 
-    tokenizer, vocab_size = tokenize_captions(all_captions)
+    tokenizer, vocab, vocab_size = tokenize_captions(all_captions)
 
     captions_max_len = get_captions_max(all_captions)
 
@@ -161,7 +189,7 @@ def train_cnn_lstm(img_cap_csv_df, batch_size = 64, save_model = True):
 
     train, test = split_train_test(imgid_cap_map, split_ratio=0.90)
 
-    img_cap_prep_dataset = ImgCapPrepDataset(train, imgid_cap_map, ext_features, tokenizer, captions_max_len, vocab_size)
+    img_cap_prep_dataset = ImgCapPrepDataset(imgid_keys=train, imgid_cap_map=imgid_cap_map, ext_features=ext_features, tokenizer=tokenizer, vocab=vocab, caps_max_len=captions_max_len, vocab_size=vocab_size)
 
     imgcap_prep_loader = DataLoader(img_cap_prep_dataset, batch_size= batch_size, shuffle=True)
 
@@ -176,7 +204,7 @@ def train_cnn_lstm(img_cap_csv_df, batch_size = 64, save_model = True):
 
     for epoch in range(num_epochs):
         # following line is to see a couple test cases
-        print_examples(img_cap_model, device, img_cap_prep_dataset)
+        # print_examples(img_cap_model, device, img_cap_prep_dataset)
         
         if save_model:
             checkpoint = {
