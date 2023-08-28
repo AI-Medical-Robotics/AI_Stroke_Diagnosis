@@ -12,6 +12,8 @@ import numpy as np
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
+import torch
+import torch.nn as nn
 import torch.optim as optim
 from model import CNNtoLSTM
 
@@ -73,18 +75,45 @@ def extract_captions(img_cap_csv_df):
         with open(img_cap_csv_df.imgid_to_prep_captions.iloc[i], "rb") as file:
             imgid_to_prep_caps = pickle.load(file)
 
-            image_id = imgid_to_prep_caps[0]
-            prep_captions_str = imgid_to_prep_caps[1]
+            # image_id = imgid_to_prep_caps[0]
+            # prep_captions_str = imgid_to_prep_caps[1]
+
+            image_id = list(imgid_to_prep_caps.keys())[0]
+            prep_captions_str = list(imgid_to_prep_caps.values())[0]
 
             imgid_cap_map[image_id] = prep_captions_str
 
-            self.logger.info("check1: imgid_to_prep_caps len = {}".format(len(imgid_to_prep_caps)))
-            self.logger.info("image_id = {}".format(image_id))
-            self.logger.info("prep_captions_str = {}".format(prep_captions_str))
+            print("check1: imgid_to_prep_caps len = {}".format(len(imgid_to_prep_caps)))
+            print("check1: imgid_to_prep_caps type = {}".format(type(imgid_to_prep_caps)))
+            # print("image_id = {}".format(image_id))
+            # print("prep_captions_str = {}".format(prep_captions_str))
 
             all_captions.append(prep_captions_str)
 
     return all_captions, imgid_cap_map
+
+def extract_features(img_cap_csv_df):
+    imgid_extfeatures_map = {}
+
+    for i in range(len(img_cap_csv_df)):
+        with open(img_cap_csv_df.imgid_to_feature.iloc[i], "rb") as file:
+            imgid_to_ext_features = pickle.load(file)
+
+            # image_id = imgid_to_ext_features[0]
+            # ext_features = imgid_to_ext_features[1]
+
+            image_id = list(imgid_to_ext_features.keys())[0]
+            ext_features = list(imgid_to_ext_features.values())[0]
+
+            imgid_extfeatures_map[image_id] = ext_features
+
+            print("check1: imgid_to_ext_features len = {}".format(len(imgid_to_ext_features)))
+            print("check1: imgid_to_ext_features type = {}".format(type(imgid_to_ext_features)))
+            print("image_id = {}".format(image_id))
+            print("ext_features len = {}".format(len(ext_features)))
+
+    return imgid_extfeatures_map
+
 
 # TODO (JG): Update to use pytorch tokenizer
 def tokenize_captions(all_captions):
@@ -113,9 +142,13 @@ def train_cnn_lstm(img_cap_csv_df, batch_size = 64, save_model = True):
     all_captions, imgid_cap_map = extract_captions(img_cap_csv_df)
     print("all_captions = {}".format(all_captions))
 
+    ext_features = extract_features(img_cap_csv_df)
+
     tokenizer, vocab_size = tokenize_captions(all_captions)
 
     captions_max_len = get_captions_max(all_captions)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Hyperparameters
     # embed_size = 256
