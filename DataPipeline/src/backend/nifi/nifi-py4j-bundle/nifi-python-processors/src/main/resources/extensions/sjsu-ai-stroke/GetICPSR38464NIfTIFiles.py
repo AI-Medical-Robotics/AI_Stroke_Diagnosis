@@ -69,20 +69,29 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
                 if filepath.endswith(".gz"):
                     if "desc-brain_mask.nii.gz" in filepath:
                         brain_dwi_mask_single.append(filepath)
+                        # self.brain_dwi_mask.append(filepath)
                         self.logger.info("filepath = {}".format(filepath))
                     elif "DWI_space-orig.nii.gz" in filepath:
                         brain_dwi_orig_single.append(filepath)
+                        # self.brain_dwi_orig.append(filepath)
                         self.logger.info("filepath = {}".format(filepath))
                     elif "desc-stroke_mask.nii.gz" in filepath:
                         stroke_dwi_mask_single.append(filepath)
+                        # self.stroke_dwi_mask.append(filepath)
                         self.logger.info("filepath = {}".format(filepath))
 
             if len(brain_dwi_mask_single) == 1 and len(brain_dwi_orig_single) == 1 and len(stroke_dwi_mask_single) == 1:
                 self.brain_dwi_orig.extend(brain_dwi_orig_single)
                 self.brain_dwi_mask.extend(brain_dwi_mask_single)
                 self.stroke_dwi_mask.extend(stroke_dwi_mask_single)
+            elif len(brain_dwi_mask_single) != 1:
+                self.logger.info("brain_dwi_mask_single didnt equal 1; it equals = {}".format(len(brain_dwi_mask_single)))
+            elif len(brain_dwi_orig_single) != 1:
+                self.logger.info("brain_dwi_orig_single didnt equal 1; it equals = {}".format(len(brain_dwi_orig_single)))
+            elif len(stroke_dwi_mask_single) != 1:
+                self.logger.info("stroke_dwi_mask_single didnt equal 1; it equals = {}".format(len(stroke_dwi_mask_single)))
             else:
-                self.logger.warn("brain_dwi_orig, brain_dwi_mask or stroke_dwi_mask didnt equal 1")
+                self.logger.info("problem occurred when processing paths for brain_dwi_orig, brain_dwi_mask or stroke_dwi_mask")
             
 
 
