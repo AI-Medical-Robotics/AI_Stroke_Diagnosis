@@ -34,11 +34,17 @@ class SaveITKImageSlice(FlowFileTransform):
 
     def __init__(self, jvm=None, **kwargs):
         # Build Property Descriptors
+        self.nifti_slices_to_save = PropertyDescriptor(
+            name = 'NifTI Percent Of 2D Image Files To Save',
+            description = 'As we process 3D voxels, and we if we verify with a sample image slice per voxel, choose a percentage of 2D image slices to save across all 3D voxels',
+            default_value="0.025",
+            required = False
+        )
         self.nifti_index = PropertyDescriptor(
-            name = 'NifTI File Index',
-            description = 'Choose table index for NifTI filepath',
+            name = 'NifTI Filepath Pandas DF Row',
+            description = 'Choose pandas dataframe row for NifTI filepath',
             default_value="0",
-            required = True
+            required = False
         )
         self.nifti_slice_divisor = PropertyDescriptor(
             name = 'NifTI 2D Slice Image Divisor',
@@ -64,7 +70,7 @@ class SaveITKImageSlice(FlowFileTransform):
             default_value="{}/src/datasets/NFBS_Dataset_NiFi/{}".format(os.path.expanduser("~"), "get_nifti"),
             required = True
         )
-        self.descriptors = [self.nifti_index, self.nifti_slice_divisor, self.nifti_data_type, self.nifti_csv_col, self.saved_img_dir]
+        self.descriptors = [self.nifti_slices_to_save, self.nifti_index, self.nifti_slice_divisor, self.nifti_data_type, self.nifti_csv_col, self.saved_img_dir]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -72,6 +78,7 @@ class SaveITKImageSlice(FlowFileTransform):
     def onScheduled(self, context):
         self.logger.info("Getting properties for nifti_index, etc")
 
+        self.nifti_percent_slices_save = context.getProperty(self.nifti_slices_to_save.name).asFloat()
         self.nifti_voxel_index = context.getProperty(self.nifti_index.name).asInteger()
         self.nifti_image_divisor = context.getProperty(self.nifti_slice_divisor.name).asInteger()
         self.nifti_data_name = context.getProperty(self.nifti_data_type.name).getValue()
@@ -129,7 +136,8 @@ class SaveITKImageSlice(FlowFileTransform):
             self.logger.info("Saving Image to path = {}".format(output_filepath))
             plt.savefig(output_filepath)
         elif self.nifti_csv_col_name == "resize_crop":
-            for nifti_index in tqdm(range(len(nifti_csv))):
+            fraction_length = int(len(nifti_csv) * self.nifti_percent_slices_save)
+            for nifti_index in tqdm(range(fraction_length)):
                 nifti_voxel, nifti_voxel_mask = self.load_itk_from_nifti(nifti_csv, nifti_index)
                 # Convert ITK image to NumPy array for matplotlib visualization
                 nifti_voxel_array = itk.GetArrayViewFromImage(nifti_voxel)
@@ -152,7 +160,8 @@ class SaveITKImageSlice(FlowFileTransform):
                 plt.savefig(output_filepath)
         elif self.nifti_csv_col_name == "intensity_norm":
             self.logger.info("Saving all intensity_norm voxels taking 1 2D slice example per voxel")
-            for nifti_index in tqdm(range(len(nifti_csv))):
+            fraction_length = int(len(nifti_csv) * self.nifti_percent_slices_save)
+            for nifti_index in tqdm(range(fraction_length)):
                 nifti_voxel, nifti_voxel_mask = self.load_itk_from_nifti(nifti_csv, nifti_index)
                 # Convert ITK image to NumPy array for matplotlib visualization
                 nifti_voxel_array = itk.GetArrayViewFromImage(nifti_voxel)
