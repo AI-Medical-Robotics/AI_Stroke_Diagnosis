@@ -36,13 +36,13 @@ class MapImageIDsToCaptions(FlowFileTransform):
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
-        description = 'Gets Flickr image captions txt metadata, performs dictionary mapping image ID to image captions, saves each dictionary element as pickle bytes and stores filepath to pandas dataframe'
-        tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'pytorch']
+        description = 'Gets image captions txt metadata, performs dictionary mapping image ID to image captions, saves each dictionary element as pickle bytes and stores filepath to pandas dataframe'
+        tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'nifti', 'pytorch']
 
     def __init__(self, **kwargs):
         # Build Property Descriptors
-        self.captions_source_path = PropertyDescriptor(name="Flickr Captions Source Path",
-            description="Flickr Captions Source Path where image captions txt metadata is located",
+        self.captions_source_path = PropertyDescriptor(name="Captions Source Path",
+            description="Captions Source Path where image IDs to captions txt metadata is located",
             validators=[StandardValidators.NON_EMPTY_VALIDATOR],
             default_value="{}/src/datasets/flickr8k/captions.txt".format(os.path.expanduser("~")),
             required=True)
@@ -58,13 +58,13 @@ class MapImageIDsToCaptions(FlowFileTransform):
             default_value=False,
             required = True,
         )
-        self.jpeg_data_type = PropertyDescriptor(
-            name = 'JPEG Dataset Name',
-            description = 'The name of the JPEG Dataset, currently supported: { flickr }.',
+        self.data_type = PropertyDescriptor(
+            name = 'Dataset Name',
+            description = 'The name of the Dataset, currently supported: { flickr, icpsr_stroke }.',
             default_value = "flickr",
             required=True
         )
-        self.descriptors = [self.captions_source_path, self.imgid_to_caption_dir, self.already_prepped, self.jpeg_data_type]
+        self.descriptors = [self.captions_source_path, self.imgid_to_caption_dir, self.already_prepped, self.data_type]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -79,7 +79,7 @@ class MapImageIDsToCaptions(FlowFileTransform):
         self.captions_source_filepath = context.getProperty(self.captions_source_path.name).getValue()
         self.imgid_to_caption_dirpath = context.getProperty(self.imgid_to_caption_dir.name).getValue()
         self.img_map_already_done = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
-        self.jpeg_data_name = context.getProperty(self.jpeg_data_type.name).getValue()
+        self.data_name = context.getProperty(self.data_type.name).getValue()
 
     def load_caption_data(self):
         with open(self.captions_source_filepath, "r") as f:
@@ -104,21 +104,22 @@ class MapImageIDsToCaptions(FlowFileTransform):
         if self.img_map_already_done:
             self.logger.info("Adding Mapped IDs to Captions filepaths to data df in imgid_to_caption_dir")
 
-            self.imgid_to_captions_files = [imgid_to_caption_dir + os.sep + self.jpeg_data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
+            self.imgid_to_captions_files = [imgid_to_caption_dir + os.sep + self.data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
             img_cap_csv_data["imgid_to_captions"] = self.imgid_to_captions_files
             self.logger.info("Retrieved Mapped IDs to Captions filepaths stored at : {}/".format(imgid_to_caption_dir))
         else:
             self.logger.info("Doing the Mapped Image IDs to Captions From Scratch")
 
-            if self.jpeg_data_name == "flickr":
-                caption_txt_labels = self.load_caption_data()
-            # elif self.jpeg_data_name == "atlas":
+            if self.data_name == "flickr":
+                cap_features_imgid_labels = self.load_caption_data()
+            # elif self.data_name == "atlas":
             #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-            # elif self.jpeg_data_name == "icpsr_stroke":
-            #     input_image = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
+            elif self.data_name == "icpsr_stroke":
+                # imgid_cap_label_df = pd.read_csv(self.captions_source_filepath)
+                cap_features_imgid_labels = self.load_caption_data()
 
             imgid_to_captions_map = {}
-            for caption_label in caption_txt_labels.split("\n"):
+            for caption_label in cap_features_imgid_labels.split("\n"):
 
                 tokens = caption_label.split(",")
                 if len(caption_label) < 2:
@@ -142,7 +143,7 @@ class MapImageIDsToCaptions(FlowFileTransform):
                 imgid_to_caption_bytes = pickle.dumps(imgid_to_captions_pair)
 
                 # Save the image name mapped torch preprocessed image
-                output_path = os.path.join(imgid_to_caption_dir, self.jpeg_data_name + "_" + str(cap_pair_i) + ".pk1")
+                output_path = os.path.join(imgid_to_caption_dir, self.data_name + "_" + str(cap_pair_i) + ".pk1")
                 self.logger.info("Mapped Image IDs to Captions pickle output_path = {}".format(output_path))
                 try:
                     with open(output_path, "wb") as file:
