@@ -31,7 +31,7 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
 
     def __init__(self, **kwargs):
         # property for icpsr base path
-        self.icpsr_path = os.path.join('/media', 'james', 'ai_projects', 'data', 'ICPSR_38464_Stroke_Data', 'MRI-DS-1-48')
+        self.icpsr_path = os.path.join('/media', 'ubuntu', 'ai_projects', 'data', 'ICPSR_38464_Stroke_Data', 'MRI-DS-1-48')
         self.dataset_base_path = PropertyDescriptor(name="ICPSR38464 Dataset Base Path",
             description="ICPSR38464 Dataset Base Path where stroke MRI data is located",
             validators=[StandardValidators.NON_EMPTY_VALIDATOR],
