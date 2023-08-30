@@ -36,8 +36,8 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
-        description = 'Gets Flickr Mapped Image IDs to Captions pickle bytes filepaths from the pandas csv dataframe in the flow file, loads these mappings from pickle bytes files, performs multiple preprocessing operations (lowercasing; removing digits, special chars, white space) on each image ID\'s captions string, returning back an updated map of image ID to prepped captions, storing these mappings to pickle bytes files'
-        tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'pytorch']
+        description = 'Gets Mapped Image IDs to Captions pickle bytes filepaths from the pandas csv dataframe in the flow file, loads these mappings from pickle bytes files, performs multiple preprocessing operations (lowercasing; removing digits, special chars, white space) on each image ID\'s captions string, returning back an updated map of image ID to prepped captions, storing these mappings to pickle bytes files'
+        tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'nifti', 'pytorch']
 
     def __init__(self, **kwargs):
         # Build Property Descriptors
@@ -53,9 +53,9 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
             default_value=False,
             required = True,
         )
-        self.jpeg_data_type = PropertyDescriptor(
-            name = 'JPEG Dataset Name',
-            description = 'The name of the JPEG Dataset, currently supported: { flickr }.',
+        self.data_type = PropertyDescriptor(
+            name = 'Dataset Name',
+            description = 'The name of the Dataset, currently supported: { flickr , icpsr_stroke}.',
             default_value = "flickr",
             required=True
         )
@@ -65,7 +65,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
             default_value = "[^A-Za-z]",
             required=True
         )
-        self.descriptors = [self.prep_torch_captions_dir, self.already_prepped, self.jpeg_data_type, self.cap_del_pattern]
+        self.descriptors = [self.prep_torch_captions_dir, self.already_prepped, self.data_type, self.cap_del_pattern]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -79,7 +79,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
         # read pre-trained model and config file
         self.prep_torch_captions_dirpath = context.getProperty(self.prep_torch_captions_dir.name).getValue()
         self.cap_prep_already_done = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
-        self.jpeg_data_name = context.getProperty(self.jpeg_data_type.name).getValue()
+        self.data_name = context.getProperty(self.data_type.name).getValue()
         self.cap_del_regex_pattern = context.getProperty(self.cap_del_pattern.name).getValue()
 
 
@@ -100,7 +100,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
         if self.cap_prep_already_done:
             self.logger.info("Adding Prepped Captions filepaths to data df in prep_torch")
 
-            self.imgid_to_prep_captions_map = [prep_captions_dir + os.sep + self.jpeg_data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
+            self.imgid_to_prep_captions_map = [prep_captions_dir + os.sep + self.data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
             img_cap_csv_data["imgid_to_prep_captions"] = self.imgid_to_prep_captions_map
             self.logger.info("Retrieved Prepped Captions filepaths stored at : {}/".format(prep_captions_dir))
         else:
@@ -109,7 +109,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
                 imgid_to_caps = None
                 imgid_to_prep_captions_dict = {}
                 # Load the image using PIL
-                if self.jpeg_data_name == "flickr":
+                if self.data_name == "flickr":
                     print("img_cap_csv_data.imgid_to_captions.iloc[i] = {}".format(img_cap_csv_data.imgid_to_captions.iloc[i]))
                     with open(img_cap_csv_data.imgid_to_captions.iloc[i], "rb") as file:
                         imgid_to_caps = pickle.load(file)
@@ -126,9 +126,9 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
                 captions_str = imgid_to_caps[1]
 
 
-                # elif self.jpeg_data_name == "atlas":
+                # elif self.data_name == "atlas":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-                # elif self.jpeg_data_name == "icpsr_stroke":
+                # elif self.data_name == "icpsr_stroke":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
 
                 for cap_i in range(len(captions_str)):
@@ -152,7 +152,7 @@ class PreprocessCaptionsForTorch(FlowFileTransform):
                 imgid_to_prep_caption_bytes = pickle.dumps(imgid_to_prep_captions_dict)
 
                 # Save the image name mapped torch preprocessed image
-                output_path = os.path.join(prep_captions_dir, self.jpeg_data_name + "_" + str(i) + ".pk1")
+                output_path = os.path.join(prep_captions_dir, self.data_name + "_" + str(i) + ".pk1")
                 self.logger.info("Mapped Image IDs to Preprocessed Captions pickle output_path = {}".format(output_path))
                 try:
                     with open(output_path, "wb") as file:
