@@ -36,7 +36,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
-        description = 'Gets Flickr Torch Preprocessed Image pickle bytes filepaths from the pandas csv dataframe in the flow file, loads each pickle bytes as a dictionary mapping image names to preprocessed images and runs pretrained pytorch cnn model (VGG16 or Resnet50) to extract features and then map to image IDs'
+        description = 'Gets Torch Preprocessed Image pickle bytes filepaths from the pandas csv dataframe in the flow file, loads each pickle bytes as a dictionary mapping image names to preprocessed images and runs pretrained pytorch cnn model (VGG16 or Resnet50) to extract features and then map to image IDs'
         tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'pytorch']
 
     def __init__(self, **kwargs):
@@ -53,9 +53,9 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
             default_value=False,
             required = True,
         )
-        self.jpeg_data_type = PropertyDescriptor(
-            name = 'JPEG Dataset Name',
-            description = 'The name of the JPEG Dataset, currently supported: { flickr }.',
+        self.data_type = PropertyDescriptor(
+            name = 'Dataset Name',
+            description = 'The name of the Dataset, currently supported: { flickr }.',
             default_value = "flickr",
             required=True
         )
@@ -65,7 +65,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
             default_value = "vgg16",
             required=True
         )
-        self.descriptors = [self.imgid_to_ext_feature_dir, self.already_prepped, self.jpeg_data_type, self.torch_model_type]
+        self.descriptors = [self.imgid_to_ext_feature_dir, self.already_prepped, self.data_type, self.torch_model_type]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -79,7 +79,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
         # read pre-trained model and config file
         self.imgid_to_ext_feature_dirpath = context.getProperty(self.imgid_to_ext_feature_dir.name).getValue()
         self.img_map_already_done = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
-        self.jpeg_data_name = context.getProperty(self.jpeg_data_type.name).getValue()
+        self.data_name = context.getProperty(self.data_type.name).getValue()
         self.torch_model_name = context.getProperty(self.torch_model_type.name).getValue()
 
     def mkdir_prep_dir(self, dirpath):
@@ -99,7 +99,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
         if self.img_map_already_done:
             self.logger.info("Adding Mapped IDs to Extracted Features filepaths to data df in imgid_to_ext_feature_dir")
 
-            self.imgid_to_feature_map = [imgid_to_extfeature_dir + os.sep + self.jpeg_data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
+            self.imgid_to_feature_map = [imgid_to_extfeature_dir + os.sep + self.data_name + "_" + str(i) + ".pk1" for i in range(len(img_cap_csv_data))]
             img_cap_csv_data["imgid_to_feature"] = self.imgid_to_feature_map
             self.logger.info("Retrieved Mapped IDs to Extracted Features filepaths stored at : {}/".format(imgid_to_extfeature_dir))
         else:
@@ -107,14 +107,15 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
             for i in range(len(img_cap_csv_data)):
                 torch_imgid_to_extfeatures = {}
                 # Load the image using PIL
-                if self.jpeg_data_name == "flickr":
+                if self.data_name == "flickr":
                     with open(img_cap_csv_data.img_name_to_prep_img.iloc[i], "rb") as file:
                         torch_prep_name_to_img = pickle.load(file)
-                # elif self.jpeg_data_name == "atlas":
+                # elif self.data_name == "atlas":
                 #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-                # elif self.jpeg_data_name == "icpsr_stroke":
-                #     input_image = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
-
+                elif self.data_name == "icpsr_stroke":
+                    with open(img_cap_csv_data.img_name_to_prep_img.iloc[i], "rb") as file:
+                        torch_prep_name_to_img = pickle.load(file)
+                
                 # Perform Torch Feature Extraction with (VGG16 or Resnet50)
                 image_filename = list(torch_prep_name_to_img.keys())[0]
                 prep_image_tensor_batch = list(torch_prep_name_to_img.values())[0]
@@ -135,7 +136,7 @@ class MapImageIDsToExtFeatures(FlowFileTransform):
                 imgid_to_extfeature_bytes = pickle.dumps(torch_imgid_to_extfeatures)
 
                 # Save the image name mapped torch preprocessed image
-                output_path = os.path.join(imgid_to_extfeature_dir, self.jpeg_data_name + "_" + str(i) + ".pk1")
+                output_path = os.path.join(imgid_to_extfeature_dir, self.data_name + "_" + str(i) + ".pk1")
                 self.logger.info("Torch Mapped IDs to Extracted Features pickle output_path = {}".format(output_path))
                 try:
                     with open(output_path, "wb") as file:
