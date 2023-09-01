@@ -33,14 +33,13 @@ from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 # TODO (JG): Limitation in flow is flow file not passed to next processor until processor finishes work. This is with each processor like this
 
 # TODO (JG): Make this work for training and testing sets
-# TODO (JG): Check if 3D Voxels is too much for Asus ROG Zephyrus
 class PreprocessImagesForTorch(FlowFileTransform):
     class Java:
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['pandas==1.3.5', 'SimpleITK==2.2.1', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
-        description = 'Gets JPEG or NifTI filepaths from the pandas csv dataframe in the flow file, loads each JPEG or NifTI file as a PIL image and performs resizing, pixel to tensor conversion and normalization on each PIL image using pytorch'
+        dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
+        description = 'Gets JPEG filepaths from the pandas csv dataframe in the flow file, loads each JPEG file as a PIL image and performs resizing, pixel to tensor conversion and normalization on each PIL image using pytorch'
         tags = ['sjsu_ms_ai', 'csv', 'PIL', 'jpeg', 'pytorch']
 
     def __init__(self, **kwargs):
@@ -59,7 +58,7 @@ class PreprocessImagesForTorch(FlowFileTransform):
         )
         self.data_type = PropertyDescriptor(
             name = 'Dataset Name',
-            description = 'The name of the Dataset, currently supported: { flickr, icpsr_stroke }.',
+            description = 'The name of the Dataset, currently supported: { flickr }.',
             default_value = "flickr",
             required=True
         )
@@ -129,12 +128,6 @@ class PreprocessImagesForTorch(FlowFileTransform):
                 if self.data_name == "flickr":
                     input_image = PIL.Image.open(img_cap_csv_data.natural_image.iloc[i])
                     img_name = os.path.basename(img_cap_csv_data.natural_image.iloc[i])
-                # elif self.data_name == "atlas":
-                #     input_image = sitk.ReadImage(img_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-                elif self.data_name == "icpsr_stroke":
-                    input_voxel = sitk.ReadImage(img_cap_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
-                    input_image = sitk.GetArrayFromImage(input_voxel)
-                    img_name = os.path.basename(img_cap_csv_data.brain_dwi_orig.iloc[i])
 
                 # Extract mean & std dev from json
                 norm_dict = json.loads(self.mean_std_norm_json_str)
@@ -143,7 +136,6 @@ class PreprocessImagesForTorch(FlowFileTransform):
                         self.logger.error("The key '{}' is missing or incorrect in the JSON data.".format(norm_key))
 
                 # Perform Torch Preprocessing: Resize, CenterCrop, ToTensor, Normalize
-                # TODO (JG): Check if pytorch ordinary transforms can work with 3D data
                 preprocess = transforms.Compose([
                     transforms.Resize(self.resize_img),
                     transforms.CenterCrop(self.center_crop_img),
