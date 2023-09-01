@@ -47,9 +47,9 @@ class JoinPdDataFrame(FlowFileTransform):
             default_value="natural_image",
             required = True
         )
-        self.jpeg_data_type = PropertyDescriptor(
-            name = 'JPEG Dataset Name',
-            description = 'The name of the JPEG Dataset, currently supported: { flickr }.',
+        self.data_type = PropertyDescriptor(
+            name = 'Dataset Name',
+            description = 'The name of the Dataset, currently supported: { flickr }.',
             default_value = "flickr",
             required=True
         )
@@ -65,7 +65,7 @@ class JoinPdDataFrame(FlowFileTransform):
             default_value = "map_imgid_to_fets",
             required=True
         )
-        self.descriptors = [self.col_join_df_by, self.jpeg_data_type, self.pandas_df_title1, self.pandas_df_title2]
+        self.descriptors = [self.col_join_df_by, self.data_type, self.pandas_df_title1, self.pandas_df_title2]
         self.counter = 0
         self.img_cap_csv_pd = None
         self.img_fet_csv_pd = None
@@ -80,7 +80,7 @@ class JoinPdDataFrame(FlowFileTransform):
         self.logger.info("Getting properties for col_join_df_on, etc")
         # read pre-trained model and config file
         self.col_join_df_on = context.getProperty(self.col_join_df_by.name).getValue()
-        self.jpeg_data_name = context.getProperty(self.jpeg_data_type.name).getValue()
+        self.data_name = context.getProperty(self.data_type.name).getValue()
         self.pandas_df_name1 = context.getProperty(self.pandas_df_title1.name).getValue()
         self.pandas_df_name2 = context.getProperty(self.pandas_df_title2.name).getValue()
 
