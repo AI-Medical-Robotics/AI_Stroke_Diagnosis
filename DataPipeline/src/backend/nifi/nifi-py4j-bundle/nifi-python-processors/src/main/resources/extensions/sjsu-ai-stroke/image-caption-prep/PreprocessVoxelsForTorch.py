@@ -144,10 +144,10 @@ class PreprocessVoxelsForTorch(FlowFileTransform):
                 # Perform Torch Preprocessing: Resize, CenterCrop, ToTensor, Normalize
                 # TODO (JG): Check if pytorch ordinary transforms can work with 3D data
                 preprocess = monai.transforms.Compose([
-                    monai.transforms.Resize(self.resize_img),
-                    monai.transforms.CenterCrop(self.center_crop_img),
-                    monai.transforms.ToTensor(),
-                    monai.transforms.Normalize(mean=norm_dict["mean"], std=norm_dict["std"])
+                    monai.transforms.Resize((self.resize_img, self.resize_img, self.resize_img)),
+                    # monai.transforms.CenterCrop(self.center_crop_img),
+                    monai.transforms.ToTensor()
+                    # monai.transforms.Normalize(mean=norm_dict["mean"], std=norm_dict["std"])
                 ])
 
                 input_img_tensor = preprocess(input_voxel_array)
