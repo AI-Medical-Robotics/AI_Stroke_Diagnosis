@@ -19,7 +19,7 @@ import torchmetrics
 from torchmetrics import Accuracy
 from focal_loss.focal_loss import FocalLoss
 
-from torch_model import UNet3D
+from torch_model import UNet3D, SimpleUNet3D
 
 # Reference perplexity.ai for pytorch 3D UNet skull strip seg model
 # https://www.perplexity.ai/search/0df235a1-27ba-4b67-bf7b-89c2500685c7?s=u
@@ -301,14 +301,17 @@ def main_alt():
     train_skull_strip_seg_model(nifti_csv_df, epochs=3)
 
 def main_unet():
+    # Note: I get an out of gpu memory issue if I use gpu device, it was probably due to not properly handling batches
+    # For now use CPU here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    unet3d_model = UNet3D(in_channels=1, out_channels=1, init_features=32).to(device)
+    unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1)
 
-    x = torch.randn((1, 96, 128, 160)).to(device)
-    x = x.unsqueeze(0)
+    x = torch.randn((4, 1, 96, 128, 160))
+    # x = x.unsqueeze(0)
 
     preds = unet3d_model(x)
 
+    print(preds.shape)
     print(x.shape)
 
     assert preds.shape == x.shape
