@@ -300,14 +300,19 @@ def main_alt():
     nifti_csv_df = pd.read_csv("skull_strip_seg_prep.csv")
     train_skull_strip_seg_model(nifti_csv_df, epochs=3)
 
-def main_unet():
+def test_unet():
     # Note: I get an out of gpu memory issue if I use gpu device, it was probably due to not properly handling batches
     # For now use CPU here
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1)
 
-    x = torch.randn((4, 1, 96, 128, 160))
-    # x = x.unsqueeze(0)
+    batch_size = 4
+    channels = 1
+    depth = 96
+    height = 128
+    width = 160
+
+    x = torch.randn((batch_size, channels, depth, height, width))
 
     preds = unet3d_model(x)
 
@@ -319,4 +324,4 @@ def main_unet():
 if __name__ == "__main__":
     # main()
     # main_alt()
-    main_unet()
+    test_unet()
