@@ -38,84 +38,115 @@ def iou_score(pred, target):
     iou = intersection / (union + 1e-7)
     return iou
 
-# Load Skull Strip Seg dataset
-# class BrainMRIDataset(torch.utils.data.Dataset):
-#     def __init__(self, brain_voxel_list, brain_mask_list, batch_size):
-#         self.batch_size = batch_size
-#         self.nifti_csv_df = pd.DataFrame({"intensity_norm": brain_voxel_list, "mask_index": brain_mask_list})
-#         # do we need to shuffle the rows of the pandas df randomly?
-#         self.nifti_csv_df = self.nifti_csv_df.sample(frac=1).reset_index(drop=True)
-
-#     def __len__(self):
-#         return len(self.nifti_csv_df) // self.batch_size
-
-#     def __getitem__(self, idx):
-#         print("idx = {}".format(idx))
-#         print("idx*self.batch_size 1st half = {}".format(idx*self.batch_size))
-#         print("(idx+1)*self.batch_size 2nd half = {}".format((idx+1)*self.batch_size))
-#         # batch_nifti_df = self.nifti_csv_df.iloc[0*self.batch_size:self.batch_size]
-#         batch_nifti_df = self.nifti_csv_df.iloc[idx*self.batch_size:(idx+1)*self.batch_size]
-#         # TODO (JG): make sure dims match ResizeCropITK py processor
-#         # sitk to torch tensor dims (batch_size, channels, depth, height, width)
-#         voxel_batch = torch.zeros((self.batch_size, 1, 96, 128, 160)).float()
-#         mask_batch = torch.zeros((self.batch_size, 1, 96, 128, 160)).float()
-#         for i, nifti_df in batch_nifti_df.iterrows():
-#             print("batch_nifti_df index = {}".format(i))
-#             voxel = sitk.ReadImage(nifti_df["intensity_norm"])
-#             voxel = sitk.GetArrayFromImage(voxel)
-#             voxel = torch.from_numpy(voxel).float()
-#             # voxel = voxel.permute(3, 1, 2, 0) # switch the depth at 0 pos and channels at 3 pos
-#             voxel = voxel.unsqueeze(0) # add new batch dim at front
-#             # print("voxel shape = {}".format(voxel.shape))
-
-#             mask_voxel = sitk.ReadImage(nifti_df["mask_index"])
-#             mask_voxel = sitk.GetArrayFromImage(mask_voxel)
-#             mask_voxel = torch.from_numpy(mask_voxel).float()
-#             mask_voxel = mask_voxel.unsqueeze(0)
-#             # print("mask_voxel shape = {}".format(mask_voxel.shape))
-
-#             voxel_batch[i] = voxel
-#             mask_batch[i] = mask_voxel
-        
-#         return voxel_batch, mask_batch
-
 class BrainMRIDataset(torch.utils.data.Dataset):
     def __init__(self, brain_voxel_list, brain_mask_list):
-        # self.batch_size = batch_size
-        self.nifti_csv_df = pd.DataFrame({"intensity_norm": brain_voxel_list, "mask_index": brain_mask_list})
-        # do we need to shuffle the rows of the pandas df randomly?
-        self.nifti_csv_df = self.nifti_csv_df.sample(frac=1).reset_index(drop=True)
-        # setup transform
-        # self.transform = transform
+        self.voxel_paths = brain_voxel_list
+        self.mask_paths = brain_mask_list
 
     def __len__(self):
-        return len(self.nifti_csv_df)
+        return len(self.voxel_paths)
 
-    def __getitem__(self, idx) -> Tuple[torch.Tensor, torch.Tensor]:
-        # print("idx = {}".format(idx))
-
-        # voxel_batch = torch.zeros((self.batch_size, 1, 96, 128, 160)).float()
-        # mask_batch = torch.zeros((self.batch_size, 1, 96, 128, 160)).float()
+    def __getitem__(self, idx):
+        print("idx = {}".format(idx))
 
         # sitk to torch tensor dims (channels, depth, height, width)
-        voxel = sitk.ReadImage(self.nifti_csv_df["intensity_norm"].iloc[idx])
-        voxel = sitk.GetArrayFromImage(voxel)
-        voxel = torch.from_numpy(voxel).float()
-        voxel = voxel.unsqueeze(0) # add new batch dim at front
-        # print("voxel shape = {}".format(voxel.shape))
+        print("self.voxel_paths[idx] = {}".format(self.voxel_paths[idx]))
+        voxel = sitk.ReadImage(self.voxel_paths[idx])
+        voxel_array = sitk.GetArrayFromImage(voxel)
+        voxel_tensor = torch.tensor(voxel_array).float()
+        print("voxel_tensor shape = {}".format(voxel_tensor.shape))
 
-        mask_voxel = sitk.ReadImage(self.nifti_csv_df["mask_index"].iloc[idx])
-        mask_voxel = sitk.GetArrayFromImage(mask_voxel)
-        mask_voxel = torch.from_numpy(mask_voxel).float()
-        mask_voxel = mask_voxel.unsqueeze(0)
-        # print("mask_voxel shape = {}".format(mask_voxel.shape))
-
-            # voxel_batch[i] = voxel
-            # mask_batch[i] = mask_voxel
+        print("self.mask_paths[idx] = {}".format(self.mask_paths[idx]))
+        mask_voxel = sitk.ReadImage(self.mask_paths[idx])
+        mask_voxel_array = sitk.GetArrayFromImage(mask_voxel)
+        mask_voxel_tensor = torch.from_numpy(mask_voxel_array).float()
+        print("mask_voxel_tensor shape = {}".format(mask_voxel_tensor.shape))
         
-        return voxel, mask_voxel
+        return voxel_tensor, mask_voxel_tensor
 
-def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
+# Simple Training for SimpleUNet3D function
+def simple_train_unet3d(nifti_csv_data, epochs=3):
+    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["mask_index"].tolist(), test_size=0.1)
+
+    print("X_train len = {}".format(len(X_train)))
+    print("X_val len = {}".format(len(X_val)))
+
+    print("Creating brain train & val datasets")
+    
+    brain_train_dataset = BrainMRIDataset(X_train, y_train)
+    brain_val_dataset = BrainMRIDataset(X_val, y_val)
+
+    print("brain_train_dataset len = {}".format(len(brain_train_dataset)))
+    print("brain_val_dataset len = {}".format(len(brain_val_dataset)))
+
+    print("Creating brain train & val dataloaders")
+
+    train_loader = DataLoader(brain_train_dataset, batch_size=2, shuffle=True, num_workers=4)
+    val_loader = DataLoader(brain_val_dataset, batch_size=2, shuffle=False)
+
+    print("Creating Skull Strip Seg UNet3D model")
+
+    # in_channels=1 for 1 medical image modality T2-weighted; out_channels=1 for skull vs non-skull
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device)
+    # unet3d_model = SimpleUNet().to(device)
+
+    print("Compiling UNet3D with Adam, FocalLoss, IoU, Accuracy")
+
+    # compile model with Adam optimizer, focal loss, metrics
+    bce_criterion = nn.BCEWithLogitsLoss().to(device)
+    optimizer = optim.Adam(unet3d_model.parameters(), lr=0.001)
+
+    # Define desired variables for tracking best validation performance
+    best_val_loss = float("inf")
+
+    print("Training UNet3D across {} epochs".format(epochs))
+
+    unet3d_model.train()
+    step = 100
+    for epoch in range(epochs):
+        print("Epoch {}: Train across batch_idx and brain_data and target from train_loader".format(epoch))
+        for batch_idx, (brain_data, target) in enumerate(train_loader):
+            brain_data = brain_data.to(device)
+            target = target.to(device)
+            print("batch_idx = {}; brain_data len = {}; target len = {}".format(batch_idx, len(brain_data), len(target)))
+            
+            optimizer.zero_grad()
+            outputs = unet3d_model(brain_data.unsqueeze(1))
+            loss = bce_criterion(outputs, target.unsqueeze(1))
+            loss.backward()
+            optimizer.step()
+
+        print("Running Evaluation")
+
+        # validation
+        unet3d_model.eval()
+        val_loss = 0.0
+        with torch.no_grad():
+            for val_brain_data, val_target in val_loader:
+                val_brain_data = val_brain_data.to(device)
+                val_target = val_target.to(device)
+
+                val_output = unet3d_model(val_brain_data.unsqueeze(1))
+                val_loss += bce_criterion(val_output, val_target.unsqueeze(1))
+        
+        # Calculate average validation loss and IoU score
+        val_loss /= len(val_loader)
+
+        # Update best validation performance and save model if it improves
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(unet3d_model.state_dict(), "best_unet3d_model_loss_{}.pt".format(step))
+
+        print(f"--------------------Epoch {epoch+1}: Train Loss: {loss:.4f} | Val Loss: {val_loss:.4f}")
+
+        step += 100
+
+        unet3d_model.train()
+
+
+
+def advanced_train_unet3d(nifti_csv_data, epochs=3):
     X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["mask_index"].tolist(), test_size=0.1)
 
     print("X_train len = {}".format(len(X_train)))
@@ -138,25 +169,23 @@ def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
 
     print("Creating brain train & val dataloaders")
 
-    train_loader = DataLoader(brain_train_dataset, batch_size=4, shuffle=True)
-    val_loader = DataLoader(brain_val_dataset, batch_size=4, shuffle=False)
-
-    brain_voxel_custom, mask_voxel_custom = next(iter(train_loader))
-
-    print("brain_voxel_custom shape = {}".format(brain_voxel_custom.shape))
-    print("mask_voxel_custom shape = {}".format(mask_voxel_custom.shape))
+    # Higher batch_size, we lose gpu memory
+    train_loader = DataLoader(brain_train_dataset, batch_size=2, shuffle=True)
+    val_loader = DataLoader(brain_val_dataset, batch_size=2, shuffle=False)
 
     print("Creating Skull Strip Seg UNet3D model")
 
     # in_channels=1 for 1 medical image modality T2-weighted; out_channels=1 for skull vs non-skull
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    unet3d_model = UNet3D(in_channels=1, out_channels=1, init_features=4).to(device)
+    unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device)
 
     print("Compiling UNet3D with Adam, FocalLoss, IoU, Accuracy")
 
     # compile model with Adam optimizer, focal loss, metrics
     optimizer = optim.Adam(unet3d_model.parameters(), lr=1e-1)
-    focal_criterion = FocalLoss(gamma=0.7).to(device)
+    # focal_criterion = FocalLoss(gamma=0.7).to(device)
+    # Use pytorch's built-in focal loss
+    bce_criterion = nn.BCEWithLogitsLoss().to(device)
     accuracy = torchmetrics.Accuracy(task="binary").to(device)
     # (num_classes=2 for skull vs non-skull
     # iou_score = torchmetrics.IoU(num_classes=2)
@@ -164,7 +193,7 @@ def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
 
     # Define desired variables for tracking best validation performance
     best_val_loss = float("inf")
-    best_val_metric = float("-inf")
+    best_val_iou = float("-inf")
 
     print("Training UNet3D across {} epochs".format(epochs))
 
@@ -178,8 +207,10 @@ def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
             print("batch_idx = {}; brain_data len = {}; target len = {}".format(batch_idx, len(brain_data), len(target)))
             
             optimizer.zero_grad()
-            output = unet3d_model(brain_data)
-            loss = focal_criterion(output, target)
+            output = unet3d_model(brain_data.unsqueeze(1))
+            # output = torch.sigmoid(output) # only for raw focal_loss, ensure predicted values are within range of 0 and 1
+            loss = bce_criterion(output, target.unsqueeze(1))
+            train_iou = iou_score(output, target.unsqueeze(1))
             loss.backward()
             optimizer.step()
 
@@ -188,15 +219,16 @@ def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
         # validation
         unet3d_model.eval()
         val_loss = 0.0
-        val_metric = 0.0
+        val_iou = 0.0
         with torch.no_grad():
             for val_brain_data, val_target in val_loader:
                 val_brain_data = val_brain_data.to(device)
                 val_target = val_target.to(device)
 
-                val_output = unet3d_model(val_brain_data)
-                val_loss += focal_criterion(val_output, val_target)
-                val_iou += iou_score(val_output, val_target)
+                val_output = unet3d_model(val_brain_data.unsqueeze(1))
+                # val_output = torch.sigmoid(val_output)
+                val_loss += bce_criterion(val_output, val_target.unsqueeze(1))
+                val_iou += iou_score(val_output, val_target.unsqueeze(1))
         
         # Calculate average validation loss and IoU score
         val_loss /= len(val_loader)
@@ -211,7 +243,7 @@ def train_skull_strip_seg_model(nifti_csv_data, epochs=3):
             best_val_iou = val_iou
             torch.save(unet3d_model.state_dict(), "best_unet3d_model_iou_{}.pt".format(step))
 
-        print(f"Epoch {epoch+1}: Train Loss: {loss:.4f} | Val Loss: {val_loss:.4f} | Val IoU: {val_iou:.4f}")
+        print(f"--------------------Epoch {epoch+1}: Train Loss: {loss:.4f} | Train IoU: {train_iou: .4f} | Val Loss: {val_loss:.4f} | Val IoU: {val_iou:.4f}")
 
         step += 100
 
@@ -296,9 +328,13 @@ def main():
         print("Stopping the subscriber...")
         zmq_subscriber.stop()
 
-def main_alt():
-    nifti_csv_df = pd.read_csv("skull_strip_seg_prep.csv")
-    train_skull_strip_seg_model(nifti_csv_df, epochs=3)
+def adv_skull_strip_seg_unet_training():
+    nifti_csv_df = pd.read_csv("nfbs_skull_strip_seg_prep.csv")
+    advanced_train_unet3d(nifti_csv_df, epochs=3)
+
+def simple_skull_strip_seg_unet_training():
+    nifti_csv_df = pd.read_csv("nfbs_skull_strip_seg_prep.csv")
+    simple_train_unet3d(nifti_csv_df, epochs=2)
 
 def test_unet():
     # Note: I get an out of gpu memory issue if I use gpu device, it was probably due to not properly handling batches
@@ -322,6 +358,6 @@ def test_unet():
     assert preds.shape == x.shape
 
 if __name__ == "__main__":
-    # main()
-    # main_alt()
-    test_unet()
+    # test_unet()
+    # simple_skull_strip_seg_unet_training()
+    adv_skull_strip_seg_unet_training()
