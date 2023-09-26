@@ -101,8 +101,9 @@ class UNet3D(nn.Module):
     # "PyTorch Image Segmentation Tutorial with U-NET: everything from scratch baby"
     # https://youtu.be/IHq1t7NxS8k?si=OoExNDXHms8J3rB2
 class SimpleUNet3D(nn.Module):
-    def __init__(self, in_channels=3, out_channels=1, hidden_features=[64, 128, 256, 512]):
+    def __init__(self, in_channels=3, out_channels=1, hidden_features=[64, 128, 256, 512], debug=False):
         super(SimpleUNet3D, self).__init__()
+        self.debug = debug
 
         self.upsampling3d = nn.ModuleList()
         self.downsampling3d = nn.ModuleList()
@@ -155,15 +156,17 @@ class SimpleUNet3D(nn.Module):
                 # NOTE: in the UNET paper, they did cropping, but we'll do resizing for this issue
             if x.shape != skip_connection.shape:
                 # we check x from outward part of upsampling, ifnequal resize our x using skip_connection resolutions just by channels, ignore h & w
-                print("x.shape = {}".format(x.shape))
-                print("skip_connection.shape = {}".format(skip_connection.shape))
-                print("skip_connection.shape[2:] = {}".format(skip_connection.shape[2:]))
+                if self.debug:
+                    print("x.shape = {}".format(x.shape))
+                    print("skip_connection.shape = {}".format(skip_connection.shape))
+                    print("skip_connection.shape[2:] = {}".format(skip_connection.shape[2:]))
                 # x = TF.resize(x, size=skip_connection.shape[2:])
                 x = F.interpolate(x, size=skip_connection.shape[2:], mode="trilinear", align_corners=False)
                 # monai_resize3d = monai.transforms.Resize(spatial_size=skip_connection.shape[2:])
                 # x = monai_resize3d(x)
 
-            print("Concatenating skip connections")
+            if self.debug:
+                print("Concatenating skip connections")
             # Concatenate skip connections and add them along channel dimensions (ex: we have batch, channel, h, w)
             concat_skip = torch.cat((skip_connection, x), dim=1)
             # Then run through DoubleConv
