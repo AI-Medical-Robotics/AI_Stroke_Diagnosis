@@ -36,6 +36,7 @@ from brain_dataset import BrainMRIDataset
 LEARNING_RATE = 1e-1
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
+VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
 NUM_EPOCHS = 3
 
@@ -63,7 +64,7 @@ def simple_train_unet3d(nifti_csv_data, epochs=3):
     print("Creating brain train & val dataloaders")
 
     train_loader = DataLoader(brain_train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-    val_loader = DataLoader(brain_val_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    val_loader = DataLoader(brain_val_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False)
 
     print("Creating Skull Strip Seg UNet3D model")
 
@@ -225,6 +226,11 @@ def mkdir_prep_dir(dirpath):
     return prep_dir
 
 # TODO (JG): Add check if dir not exist, create it, else it fails
+# NOTE (JG): This save predictions as segs is like Aladdin's save_predictions_imgs(...), but
+# it saves those images in the batch to one image. In that example, batch_size = 16, 
+# so 16 objects (cars) were saved to an image.
+# This approach would be difficult for our approach. So, what I will be is keep this 
+# script to train the skull strip seg model here and then deploy it in NiFi, then save it individually.
 def save_predictions_as_segs(loader, model, folder="saved_segs", device="cuda"):
     model.eval()
 
@@ -254,9 +260,6 @@ def save_predictions_as_seg_slices(loader, model, folder="saved_seg_slices", dev
     nifti_csv_col_name = "skull_strip_seg"
 
     for idx, (x, y) in enumerate(loader):
-        # check batch size > 1, then run predictions and select slice from 96 slices of an MRI per MRI
-        # else after prediction, I noticed the order is different and causes an issue choosing slice
-        if x.shape[0] > 1 and y.shape[0]:
             print("x.shape = {}".format(x.shape))
             print("y.shape = {}".format(y.shape))
             x = x.to(device=device).unsqueeze(1)
@@ -269,35 +272,31 @@ def save_predictions_as_seg_slices(loader, model, folder="saved_seg_slices", dev
 
             print("preds.shape = {}".format(preds.shape))
             preds_np = preds.squeeze().cpu().numpy()
-            preds_sitk = sitk.GetImageFromArray(preds_np)
-            ground_sitk = sitk.GetImageFromArray(y.squeeze().cpu().numpy())
+            print("preds_np.shape = {}".format(preds_np.shape))
+            ground_y_np = y.squeeze().cpu().numpy()
+            print("ground_y_np.shape = {}".format(ground_y_np.shape))
+            # preds_sitk = sitk.GetImageFromArray(preds_np)
+            # ground_sitk = sitk.GetImageFromArray(ground_y_np)
 
-            print("ground_sitk.GetSize() = {}".format(ground_sitk.GetSize()))
-            print("preds_sitk.GetSize() = {}".format(preds_sitk.GetSize()))        
+            # print("ground_sitk.GetSize() = {}".format(ground_sitk.GetSize()))
+            # print("preds_sitk.GetSize() = {}".format(preds_sitk.GetSize()))        
 
-            # if ground_sitk.GetSize() == preds_sitk.GetSize():
-                # Create a figure and axis for visualization
             fig, ax = plt.subplots(1, 2, figsize=(14, 10))
-            ax[0].set_title("NifTI {} 2D Image ID {} GroundT Slice = {}".format(idx, nifti_data_type, ground_sitk.GetSize()))
+            ax[0].set_title("NifTI {} 2D Image ID {} GroundT Slice = {}".format(idx, nifti_data_type, ground_y_np.shape))
             # Display the 2D image slice
-            print("ground_sitk.GetSize()[1] = {}".format(ground_sitk.GetSize()[1]))
-            ax[0].imshow(ground_sitk[ground_sitk.GetSize()[1]//nifti_seg_2d_slice_divisor])
+            print("ground_y_np.shape[0] = {}".format(ground_y_np.shape[0]))
+            ax[0].imshow(ground_y_np[ground_y_np.shape[0]//nifti_seg_2d_slice_divisor])
 
-            print("preds_sitk.GetSize()[1] = {}".format(preds_sitk.GetSize()[1]))
-            ax[1].set_title("NifTI {} 2D Image ID {} Mask Slice = {}".format(idx, nifti_data_type, preds_sitk.GetSize()))
-            ax[1].imshow(preds_sitk[preds_sitk.GetSize()[1]//nifti_seg_2d_slice_divisor])
+            print("preds_np.shape[0] = {}".format(preds_np.shape[0]))
+            ax[1].set_title("NifTI {} 2D Image ID {} Pred Mask Slice = {}".format(idx, nifti_data_type, preds_np.shape))
+            ax[1].imshow(preds_np[preds_np.shape[0]//nifti_seg_2d_slice_divisor])
 
             # Save the 2D image slice as file
             saved_itk_image_dir = mkdir_prep_dir(folder)
-            output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(idx, preds_sitk.GetSize()[1]//nifti_seg_2d_slice_divisor, nifti_csv_col_name, "png")
+            output_filename = "brain_ssseg_id_{}_slice_{}_{}.{}".format(idx, preds_np.shape[0]//nifti_seg_2d_slice_divisor, nifti_csv_col_name, "png")
             output_filepath = os.path.join(saved_itk_image_dir, output_filename)
             print("Saving Image to path = {}".format(output_filepath))
             plt.savefig(output_filepath)
-
-            # sitk.WriteImage(preds_sitk, f"{folder}/pred_{idx}.nii.gz")
-            # sitk.WriteImage(ground_sitk, f"{folder}/{idx}.nii.gz")
-        # else:
-        #     print("GroundT != Preds SimpleITK voxel")
 
     model.train()
 
@@ -323,7 +322,7 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
 
     # Higher batch_size, we lose gpu memory
     train_loader = DataLoader(brain_train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(brain_val_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    val_loader = DataLoader(brain_val_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False)
 
     print("Creating Skull Strip Seg UNet3D model")
 
