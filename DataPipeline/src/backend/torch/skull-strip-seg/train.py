@@ -38,7 +38,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 3
+NUM_EPOCHS = 7
+DEBUG = False
 
 def iou_score(pred, target):
     intersection = torch.logical_and(pred, target).sum()
@@ -252,60 +253,64 @@ def save_predictions_as_segs(loader, model, folder="saved_segs", device="cuda"):
 
     model.train()
 
-def save_predictions_as_seg_slices(loader, model, folder="saved_seg_slices", device="cuda"):
+def save_predictions_as_seg_slices(loader, model, dataset_name, folder="saved_seg_slices", device="cuda"):
     # nifti_percent_slices_save = 0.025
     # nifti_filepath_df_row = 0
     nifti_seg_2d_slice_divisor = 2
-    nifti_data_type = "nfbs"
+    nifti_data_type = dataset_name
     nifti_csv_col_name = "skull_strip_seg"
 
     for idx, (x, y) in enumerate(loader):
+        if DEBUG:
             print("x.shape = {}".format(x.shape))
             print("y.shape = {}".format(y.shape))
-            x = x.to(device=device).unsqueeze(1)
+        x = x.to(device=device).unsqueeze(1)
+        y = y.unsqueeze(1)
+
+        if DEBUG:
             print("unsequeeze x.shape = {}".format(x.shape))
-            y = y.unsqueeze(1)
             print("unsequeeze y.shape = {}".format(y.shape))
-            with torch.no_grad():
-                preds = torch.sigmoid(model(x))
-                preds = (preds > 0.5).float()
 
-            print("preds.shape = {}".format(preds.shape))
+        with torch.no_grad():
+            preds = torch.sigmoid(model(x))
+            preds = (preds > 0.5).float()
+
             preds_np = preds.squeeze().cpu().numpy()
-            print("preds_np.shape = {}".format(preds_np.shape))
             ground_y_np = y.squeeze().cpu().numpy()
+
+        if DEBUG:
+            print("preds.shape = {}".format(preds.shape))
+            print("preds_np.shape = {}".format(preds_np.shape))
             print("ground_y_np.shape = {}".format(ground_y_np.shape))
-            # preds_sitk = sitk.GetImageFromArray(preds_np)
-            # ground_sitk = sitk.GetImageFromArray(ground_y_np)
 
-            # print("ground_sitk.GetSize() = {}".format(ground_sitk.GetSize()))
-            # print("preds_sitk.GetSize() = {}".format(preds_sitk.GetSize()))        
+        fig, ax = plt.subplots(1, 2, figsize=(14, 10))
+        ax[0].set_title("NifTI {} 2D Image ID {} GroundT Slice = {}".format(idx, nifti_data_type, ground_y_np.shape))
+        ax[0].imshow(ground_y_np[ground_y_np.shape[0]//nifti_seg_2d_slice_divisor])
 
-            fig, ax = plt.subplots(1, 2, figsize=(14, 10))
-            ax[0].set_title("NifTI {} 2D Image ID {} GroundT Slice = {}".format(idx, nifti_data_type, ground_y_np.shape))
-            # Display the 2D image slice
+        if DEBUG:
             print("ground_y_np.shape[0] = {}".format(ground_y_np.shape[0]))
-            ax[0].imshow(ground_y_np[ground_y_np.shape[0]//nifti_seg_2d_slice_divisor])
-
             print("preds_np.shape[0] = {}".format(preds_np.shape[0]))
-            ax[1].set_title("NifTI {} 2D Image ID {} Pred Mask Slice = {}".format(idx, nifti_data_type, preds_np.shape))
-            ax[1].imshow(preds_np[preds_np.shape[0]//nifti_seg_2d_slice_divisor])
 
-            # Save the 2D image slice as file
-            saved_itk_image_dir = mkdir_prep_dir(folder)
-            output_filename = "brain_ssseg_id_{}_slice_{}_{}.{}".format(idx, preds_np.shape[0]//nifti_seg_2d_slice_divisor, nifti_csv_col_name, "png")
-            output_filepath = os.path.join(saved_itk_image_dir, output_filename)
-            print("Saving Image to path = {}".format(output_filepath))
-            plt.savefig(output_filepath)
+        ax[1].set_title("NifTI {} 2D Image ID {} Pred Mask Slice = {}".format(idx, nifti_data_type, preds_np.shape))
+        ax[1].imshow(preds_np[preds_np.shape[0]//nifti_seg_2d_slice_divisor])
+
+        # Save the 2D image slice as file
+        saved_itk_image_dir = mkdir_prep_dir(folder)
+        output_filename = "brain_ssseg_id_{}_slice_{}_{}.{}".format(idx, preds_np.shape[0]//nifti_seg_2d_slice_divisor, nifti_csv_col_name, "png")
+        output_filepath = os.path.join(saved_itk_image_dir, output_filename)
+        plt.savefig(output_filepath)
+
+        if DEBUG:
+            print("Saved Image to path = {}".format(output_filepath))
 
     model.train()
 
 
 
-def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
+def advanced_train_unet3d(nifti_csv_data, dataset_name="icpsr"):
     X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["mask_index"].tolist(), test_size=0.1)
 
-    if debug:
+    if DEBUG:
         print("X_train len = {}".format(len(X_train)))
         print("X_val len = {}".format(len(X_val)))
 
@@ -314,7 +319,7 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
     brain_train_dataset = BrainMRIDataset(X_train, y_train)
     brain_val_dataset = BrainMRIDataset(X_val, y_val)
 
-    if debug:
+    if DEBUG:
         print("brain_train_dataset len = {}".format(len(brain_train_dataset)))
         print("brain_val_dataset len = {}".format(len(brain_val_dataset)))
 
@@ -339,7 +344,7 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
 
     step = 100
     if LOAD_MODEL:
-        load_checkpoint(torch.load("best_unet3d_model_loss_{}.pt"))
+        load_checkpoint(torch.load("best_unet3d_model_loss_{}.pt".format(step)), unet3d_model)
         check_accuracy(val_loader, unet3d_model, device=DEVICE)
 
     # accuracy = torchmetrics.Accuracy(task="binary").to(device=DEVICE)
@@ -353,12 +358,12 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
     # best_val_loss = float("inf")
     # best_val_iou = float("-inf")
 
-    print("Training UNet3D across {} epochs".format(NUM_EPOCHS))
+    print("Training UNet3D on {} across {} epochs".format(dataset_name, NUM_EPOCHS))
 
     # unet3d_model.train()
     step = 100
     for epoch in range(NUM_EPOCHS):
-        if debug:
+        if DEBUG:
             print("Epoch {}: Train across batch_idx and brain_data and target from train_loader".format(NUM_EPOCHS))
         train_unet3d(train_loader, unet3d_model, optimizer, bce_criterion, scaler)
 
@@ -367,7 +372,8 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
             "state_dict": unet3d_model.state_dict(),
             "optimizer": optimizer.state_dict(),
         }
-        filename = "best_unet3d_model_{}.pth.tar".format(step)
+        mkdir_prep_dir("{}/models".format(dataset_name))
+        filename = "{}/models/unet3d_skull_strip_seg_{}.pth.tar".format(dataset_name, step)
         save_checkpoint(checkpoint, filename=filename)
 
         print("Running Evaluation")
@@ -379,7 +385,7 @@ def advanced_train_unet3d(nifti_csv_data, epochs=3, debug=False):
         # )
 
         save_predictions_as_seg_slices(
-            val_loader, unet3d_model, folder="saved_seg_slices", device=DEVICE
+            val_loader, unet3d_model, dataset_name, folder="{}/saved_seg_slices/{}".format(dataset_name, step), device=DEVICE
         )
 
         step += 100
@@ -467,10 +473,14 @@ def main():
         print("Stopping the subscriber...")
         zmq_subscriber.stop()
 
-def adv_skull_strip_seg_unet_training():
-    debug = False
-    nifti_csv_df = pd.read_csv("nfbs_skull_strip_seg_prep.csv")
-    advanced_train_unet3d(nifti_csv_df, epochs=7)
+def nfbs_skull_strip_seg_unet_training():
+    nifti_csv_df = pd.read_csv("nfbs/prep/nfbs_skull_strip_seg_prep.csv")
+    advanced_train_unet3d(nifti_csv_df, dataset_name="nfbs")
+
+def icpsr_skull_strip_seg_unet_training():
+    nifti_csv_df = pd.read_csv("icpsr/prep/icpsr_skull_strip_seg_prep.csv")
+    advanced_train_unet3d(nifti_csv_df, dataset_name="icpsr")
+
 
 def simple_skull_strip_seg_unet_training():
     nifti_csv_df = pd.read_csv("nfbs_skull_strip_seg_prep.csv")
@@ -500,4 +510,5 @@ def test_unet():
 if __name__ == "__main__":
     # test_unet()
     # simple_skull_strip_seg_unet_training()
-    adv_skull_strip_seg_unet_training()
+    nfbs_skull_strip_seg_unet_training()
+    # icpsr_skull_strip_seg_unet_training()
