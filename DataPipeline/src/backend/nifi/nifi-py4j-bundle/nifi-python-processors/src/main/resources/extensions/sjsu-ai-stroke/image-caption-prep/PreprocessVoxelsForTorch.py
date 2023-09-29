@@ -25,14 +25,11 @@ import monai
 # import torchvision.transforms as transforms
 import pickle5 as pickle
 
-# import PIL
 import SimpleITK as sitk
 
 # from tqdm import tqdm
 from nifiapi.properties import PropertyDescriptor
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
-
-# Verified we can run SimpleITK N4 Bias Field Correction and produces expected results faster than nipype's version
 
 # TODO (JG): Limitation in flow is flow file not passed to next processor until processor finishes work. This is with each processor like this
 
