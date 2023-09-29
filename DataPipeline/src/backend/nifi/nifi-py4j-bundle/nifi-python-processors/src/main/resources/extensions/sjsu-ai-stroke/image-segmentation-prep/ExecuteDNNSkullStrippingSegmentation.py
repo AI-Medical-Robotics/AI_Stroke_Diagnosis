@@ -19,7 +19,9 @@ import pandas as pd
 
 import torch
 import torch.nn as nn
+import torch.optim as optim
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 
 import SimpleITK as sitk
 
@@ -28,13 +30,13 @@ from nifiapi.properties import PropertyDescriptor
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 
 class BrainMRIDataset(torch.utils.data.Dataset):
-    def __init__(self, brain_voxel_list, brain_mask_list, debug=False):
-        self.voxel_paths = brain_voxel_list
-        self.mask_paths = brain_mask_list
+    def __init__(self, brain_voxel_list, skull_mask_list, debug=False):
+        self.brain_voxel_paths = brain_voxel_list
+        self.skull_mask_paths = skull_mask_list
         self.debug = debug
 
     def __len__(self):
-        return len(self.voxel_paths)
+        return len(self.brain_voxel_paths)
 
     def __getitem__(self, idx):
         if self.debug:
@@ -42,15 +44,15 @@ class BrainMRIDataset(torch.utils.data.Dataset):
 
         # sitk to torch tensor dims (channels, depth, height, width)
         if self.debug:
-            print("self.voxel_paths[idx] = {}".format(self.voxel_paths[idx]))
-        voxel = sitk.ReadImage(self.voxel_paths[idx])
+            print("self.brain_voxel_paths[idx] = {}".format(self.brain_voxel_paths[idx]))
+        voxel = sitk.ReadImage(self.brain_voxel_paths[idx])
         voxel_array = sitk.GetArrayFromImage(voxel)
         voxel_tensor = torch.tensor(voxel_array).float()
         if self.debug:
             print("voxel_tensor shape = {}".format(voxel_tensor.shape))
-            print("self.mask_paths[idx] = {}".format(self.mask_paths[idx]))
+            print("self.skull_mask_paths[idx] = {}".format(self.skull_mask_paths[idx]))
 
-        mask_voxel = sitk.ReadImage(self.mask_paths[idx])
+        mask_voxel = sitk.ReadImage(self.skull_mask_paths[idx])
         mask_voxel_array = sitk.GetArrayFromImage(mask_voxel)
         mask_voxel_tensor = torch.from_numpy(mask_voxel_array).float()
 
@@ -149,8 +151,10 @@ class SimpleUNet3D(nn.Module):
         return self.final_conv3d(x)
 
 
-
-# Verified we can run SimpleITK N4 Bias Field Correction and produces expected results faster than nipype's version
+# TODO (JG): Add flexibility to deploy NFBS or ICPSR based trained Skull Stripping Segmentation model
+    # NOTE (JG): If I use NFBS SSS model, then I dont need to consider how much data I trained model on
+    # TODO (JG): If I use ICPSR SSS model, then I will need to consider how much data I trained model on, so I dont overtrain. Make
+        # sure to not deploy model and pass ICPSR data that SSS model has already seen.
 
 # TODO (JG): Limitation in flow is flow file not passed to next processor until processor finishes work. This is with each processor like this
 
@@ -166,9 +170,10 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
 
     def __init__(self, **kwargs):
         # Build Property Descriptors
+        # "/media/bizon/ai_projects/data/ICPSR_38464_Stroke_Data_NiFi/skull_strip_seg/pred_0.nii.gz"
         self.skull_strip_seg_dir = PropertyDescriptor(
             name = 'Skull Stripping Segmentation Destination Path',
-            description = 'The folder to store the 3D skull stripping segmentation NIfTI files',
+            description = 'The folder to store the 3D skull stripping segmentation NIfTI files in preparation later for stroke lesion segmentation training',
             default_value="{}/src/datasets/atlas_NiFi/{}".format(os.path.expanduser("~"), "skull_strip_seg"),
             required = True
         )
@@ -196,13 +201,13 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
             default_value = "1",
             required=True
         )
-        self.torch_model_file = PropertyDescriptor(
+        self.torch_model_filepath = PropertyDescriptor(
             name = 'PyTorch 3D DNN Model',
             description = 'The filepath of the pretrained pytorch 3D skull stripping segmentation model to use for brain tissue extraction, currently supported: { unet3d }.',
-            default_value = "best_unet3d_model_loss_100.pt",
+            default_value = "{}/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/{}/icpsr/models/unet3d_skull_strip_seg_700.pth.tar".format(os.path.expanduser("~"), "skull-strip-seg"),
             required=True
         )
-        self.descriptors = [self.skull_strip_seg_dir, self.already_prepped, self.data_type, self.batch_size, self.torch_model_file]
+        self.descriptors = [self.skull_strip_seg_dir, self.already_prepped, self.data_type, self.batch_size, self.torch_model_filepath]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -218,8 +223,9 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
         self.skull_strip_seg_already_done = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
         self.data_name = context.getProperty(self.data_type.name).getValue()
         self.inference_batch_size = context.getProperty(self.batch_size.name).asInteger()
-        self.torch_model_filename = context.getProperty(self.torch_model_file.name).getValue()
-        self.LEARNING_RATE = context.getProperty(self.torch_learning_rate.name).asFloat()
+        self.torch_dnn_filepath = context.getProperty(self.torch_model_filepath.name).getValue()
+        # self.LEARNING_RATE = context.getProperty(self.torch_learning_rate.name).asFloat()
+        self.LEARNING_RATE = 1e-1
         self.DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def mkdir_prep_dir(self, dirpath):
@@ -230,7 +236,7 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
         return prep_dir
 
     def load_checkpoint(self, checkpoint, model):
-        print("=> Loading Checkpoint")
+        self.logger.info("=> Loading Checkpoint")
         model.load_state_dict(checkpoint["state_dict"])
 
     def check_accuracy(self, loader, model, device="cuda"):
@@ -253,8 +259,8 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
                     (preds + y).sum() + 1e-8
                 )
         
-        print(f"Acc Ratio {num_correct}/{num_pixels} with Acc {num_correct/num_pixels*100:.2f}")
-        print(f"Dice Score: {dice_score/len(loader)}")
+        self.logger.info(f"Acc Ratio {num_correct}/{num_pixels} with Acc {num_correct/num_pixels*100:.2f}")
+        self.logger.info(f"Dice Score: {dice_score/len(loader)}")
 
     def save_predictions_as_segs(self, loader, model, folder, device="cuda"):
         model.eval()
@@ -296,17 +302,19 @@ class ExecuteDNNSkullStrippingSegmentation(FlowFileTransform):
             self.logger.info("Doing the PyTorch 3D Skull Stripping Segmentation NIfTI From Scratch")
             # for i in range(len(nifti_csv_data)):
             brain_voxel_list = nifti_csv_data["intensity_norm"].tolist()
-            brain_mask_list = nifti_csv_data["mask_index"].tolist()
+            # We ignore brain mask since we are only using this processor for Skull Stripping Segmentation Inference
+                # TODO (JG): Remove skull_mask_list and remove it from any functions using it
+            skull_mask_list = nifti_csv_data["skull_mask_index"].tolist()
 
-            brain_dataset = BrainMRIDataset(brain_voxel_list, brain_mask_list)
+            brain_dataset = BrainMRIDataset(brain_voxel_list, skull_mask_list)
 
-            brain_dataloader = DataLoader(brain_train_dataset, batch_size=self.inference_batch_size, shuffle=False)
+            brain_dataloader = DataLoader(brain_dataset, batch_size=self.inference_batch_size, shuffle=False)
 
             # Create the UNet3D model and then load the weights
             unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device=self.DEVICE)
             optimizer = optim.Adam(unet3d_model.parameters(), lr=self.LEARNING_RATE)
             bce_criterion = nn.BCEWithLogitsLoss().to(device=self.DEVICE)
-            self.load_checkpoint(torch.load(self.torch_model_filename), unet3d_model)
+            self.load_checkpoint(torch.load(self.torch_dnn_filepath), unet3d_model)
             self.check_accuracy(brain_dataloader, unet3d_model, device=self.DEVICE)
 
             self.save_predictions_as_segs(
