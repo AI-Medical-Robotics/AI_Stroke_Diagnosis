@@ -69,54 +69,66 @@ After training on ICPSR 38464 dataset, each 3D UNet model gets saved per epoch a
 ~~~
 Compiling UNet3D with Adam, BCEWithLogitsLoss, Dice Score, Accuracy
 Training UNet3D on icpsr across 7 epochs
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:38<00:00,  3.90it/s, loss=0.0127]
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:38<00:00,  3.88it/s, loss=0.0157]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 78927249/79298560 with Acc 99.53
-Dice Score: 0.24076980352401733
-/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/skull-strip-seg/train.py:286: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+Acc Ratio 236423428/237895680 with Acc 99.38
+Dice Score: 0.5113473534584045
+/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/skull-strip-seg/train.py:207: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
   fig, ax = plt.subplots(1, 2, figsize=(14, 10))
-100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:39<00:00,  3.90it/s, loss=0.00772]
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:37<00:00,  3.89it/s, loss=0.00894]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 78898421/79298560 with Acc 99.50
-Dice Score: 0.5353542566299438
-100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:39<00:00,  3.89it/s, loss=0.00587]
+Acc Ratio 236988598/237895680 with Acc 99.62
+Dice Score: 0.5275589227676392
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:35<00:00,  3.92it/s, loss=0.0113]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 79028701/79298560 with Acc 99.66
-Dice Score: 0.5896857976913452
-100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:37<00:00,  3.91it/s, loss=0.00795]
+Acc Ratio 237066952/237895680 with Acc 99.65
+Dice Score: 0.5891886949539185
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:36<00:00,  3.91it/s, loss=0.0055]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 79042141/79298560 with Acc 99.68
-Dice Score: 0.5159244537353516
-100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:39<00:00,  3.90it/s, loss=0.00333]
+Acc Ratio 236993849/237895680 with Acc 99.62
+Dice Score: 0.45991578698158264
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:36<00:00,  3.91it/s, loss=0.00493]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 79085863/79298560 with Acc 99.73
-Dice Score: 0.6671044826507568
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:38<00:00,  3.91it/s, loss=0.027]
+Acc Ratio 237070120/237895680 with Acc 99.65
+Dice Score: 0.5947967767715454
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [03:35<00:00,  3.93it/s, loss=0.00501]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 78981264/79298560 with Acc 99.60
-Dice Score: 0.3892383277416229
-100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1088/1088 [04:38<00:00,  3.91it/s, loss=0.0057]
+Acc Ratio 237116484/237895680 with Acc 99.67
+Dice Score: 0.5226009488105774
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 846/846 [04:33<00:00,  3.09it/s, loss=0.00534]
 => Saving Checkpoint
 Running Evaluation
-Acc Ratio 79055849/79298560 with Acc 99.69
-Dice Score: 0.6671208739280701
+Acc Ratio 236830325/237895680 with Acc 99.55
+Dice Score: 0.6142829060554504
 ~~~
 
 ![](skull-strip-seg/icpsr/saved_seg_slices/700/brain_ssseg_id_38_slice_10_skull_strip_seg.png)
 
 ## Stroke Lesion Segmentation
 
+Now that we saved skull stripped segmentation data preprocessed MRI voxels from our brain dataset (ICPSR38464), we'll try training our 3D UNet on Stroke Lesion Segmentation of varying sizes of stroke lesions.
+
 - General Stroke Lesion Segmentation (trained on Ischemic, Hemorrhagic, etc)
 
 Specifically trained on:
 
 - Ischemic Stroke Lesion Segmentation
+- Hemorrhagic Stroke Lesion Segmentation
+
+### ICPSR 38464 Dataset
+
+- General Stroke Lesion Segmentation
+
+
+
+- Ischemic Stroke Lesion Segmentation
+
 - Hemorrhagic Stroke Lesion Segmentation
 
 ## Stroke Lesion Image Captioning
