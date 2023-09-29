@@ -79,13 +79,16 @@ class ResizeCropITKImage(FlowFileTransform):
     def onScheduled(self, context):
         self.logger.info("Getting properties for rescrop_dirpath, etc")
         self.raw_index = list()
-        self.mask_index = list()
+        self.skull_mask_index = list()
         # read pre-trained model and config file
         self.rescrop_dirpath = context.getProperty(self.rescrop_dir.name).getValue()
         self.already_rescropped = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
         self.nifti_data_name = context.getProperty(self.nifti_data_type.name).getValue()
         self.resample_spacing_resolution = context.getProperty(self.spacing_resolution.name).asFloat()
         self.target_dims_json_str = context.getProperty(self.dimensions.name).getValue()
+
+        if self.nifti_data_name == "icpsr_stroke":
+            self.stroke_mask_index = list()
 
     def mkdir_prep_dir(self, dirpath):
         """make preprocess directory if doesn't exist"""
@@ -117,12 +120,16 @@ class ResizeCropITKImage(FlowFileTransform):
         # In NiFi Python Processor, add property for this
         self.logger.info("self.already_rescropped type = {}".format(type(self.already_rescropped)))
         if self.already_rescropped:
-            self.logger.info("Adding Prepped SimpleITK Resized & Cropped filepaths to data df in raw_index & mask_index")
+            self.logger.info("Adding Prepped SimpleITK Resized & Cropped filepaths to data df in raw_index & skull_mask_index")
 
             for i in tqdm(range(len(nifti_csv_data))):
                 self.raw_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_" + "raw" + str(i) + ".nii.gz")
                 
-                self.mask_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_" + "mask" + str(i) + ".nii.gz")
+                self.skull_mask_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_skull_" + "mask" + str(i) + ".nii.gz")
+
+                if self.nifti_data_name == "icpsr_stroke":
+                    output_stroke_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_lesion_" + "mask" + str(i) + ".nii.gz")
+                    self.stroke_mask_index.append(output_stroke_mask_path)
 
             self.logger.info("Retrieved Prepped Resized & Cropped voxel filepaths stored at : {}/".format(resized_cropped_dir))
         else:
@@ -169,25 +176,40 @@ class ResizeCropITKImage(FlowFileTransform):
                 self.raw_index.append(output_image_path)
 
                 if self.nifti_data_name == "nfbs":
-                    input_mask = sitk.ReadImage(nifti_csv_data.brain_mask.iloc[i])
+                    input_skull_mask = sitk.ReadImage(nifti_csv_data.brain_mask.iloc[i])
                 elif self.nifti_data_name == "atlas":
-                    # TODO (JG): For atlas2.0, we have training and testing, address it
-                    input_mask = sitk.ReadImage(nifti_csv_data.train_lesion_mask.iloc[i])
+                    # TODO (JG): For atlas 2.0, change input_skull_mask to input_stroke_mask
+                    input_skull_mask = sitk.ReadImage(nifti_csv_data.train_lesion_mask.iloc[i])
                 elif self.nifti_data_name == "icpsr_stroke":
-                    input_mask = sitk.ReadImage(nifti_csv_data.brain_dwi_mask.iloc[i])
+                    input_skull_mask = sitk.ReadImage(nifti_csv_data.brain_dwi_mask.iloc[i])
+                    input_stroke_mask = sitk.ReadImage(nifti_csv_data.stroke_dwi_mask.iloc[i])
 
-                output_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_" + "mask" + str(i) + ".nii.gz")
+                    output_stroke_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_lesion_" + "mask" + str(i) + ".nii.gz")
+
+                    # Resample and crop the image using SimpleITK
+                    resampled_stroke_mask = self.sitk_resample_crop(input_stroke_mask, new_affine, target_shape, new_resolution)
+
+                    # Write the resampled and cropped mask using ITK
+                    sitk.WriteImage(resampled_stroke_mask, output_stroke_mask_path)
+                    self.stroke_mask_index.append(output_stroke_mask_path)
+
+
+                output_skull_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_skull_" + "mask" + str(i) + ".nii.gz")
 
                 # Resample and crop the image using SimpleITK
-                resampled_mask = self.sitk_resample_crop(input_mask, new_affine, target_shape, new_resolution)
+                resampled_skull_mask = self.sitk_resample_crop(input_skull_mask, new_affine, target_shape, new_resolution)
 
                 # Write the resampled and cropped mask using ITK
-                sitk.WriteImage(resampled_mask, output_mask_path)
-                self.mask_index.append(output_mask_path)
+                sitk.WriteImage(resampled_skull_mask, output_skull_mask_path)
+                self.skull_mask_index.append(output_skull_mask_path)
             self.logger.info("ITK Resized & Cropped voxels stored at: {}/".format(resized_cropped_dir))
 
         nifti_csv_data["raw_index"] = self.raw_index
-        nifti_csv_data["mask_index"] = self.mask_index
+        nifti_csv_data["skull_mask_index"] = self.skull_mask_index
+
+        if self.nifti_data_name == "icpsr_stroke":
+            nifti_csv_data["stroke_mask_index"] = self.stroke_mask_index
+            return nifti_csv_data
 
         return nifti_csv_data
 
