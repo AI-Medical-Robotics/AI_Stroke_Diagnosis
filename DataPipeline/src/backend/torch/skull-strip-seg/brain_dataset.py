@@ -9,13 +9,13 @@ import SimpleITK as sitk
 # Refer to section on "MRIDataset(Dataset)"
 
 class BrainMRIDataset(torch.utils.data.Dataset):
-    def __init__(self, brain_voxel_list, brain_mask_list, debug=False):
-        self.voxel_paths = brain_voxel_list
-        self.mask_paths = brain_mask_list
+    def __init__(self, brain_voxel_list, skull_mask_list, debug=False):
+        self.brain_voxel_paths = brain_voxel_list
+        self.skull_mask_paths = skull_mask_list
         self.debug = debug
 
     def __len__(self):
-        return len(self.voxel_paths)
+        return len(self.brain_voxel_paths)
 
     def __getitem__(self, idx):
         if self.debug:
@@ -23,15 +23,15 @@ class BrainMRIDataset(torch.utils.data.Dataset):
 
         # sitk to torch tensor dims (channels, depth, height, width)
         if self.debug:
-            print("self.voxel_paths[idx] = {}".format(self.voxel_paths[idx]))
-        voxel = sitk.ReadImage(self.voxel_paths[idx])
+            print("self.brain_voxel_paths[idx] = {}".format(self.brain_voxel_paths[idx]))
+        voxel = sitk.ReadImage(self.brain_voxel_paths[idx])
         voxel_array = sitk.GetArrayFromImage(voxel)
         voxel_tensor = torch.tensor(voxel_array).float()
         if self.debug:
             print("voxel_tensor shape = {}".format(voxel_tensor.shape))
-            print("self.mask_paths[idx] = {}".format(self.mask_paths[idx]))
+            print("self.skull_mask_paths[idx] = {}".format(self.skull_mask_paths[idx]))
 
-        mask_voxel = sitk.ReadImage(self.mask_paths[idx])
+        mask_voxel = sitk.ReadImage(self.skull_mask_paths[idx])
         mask_voxel_array = sitk.GetArrayFromImage(mask_voxel)
         mask_voxel_tensor = torch.from_numpy(mask_voxel_array).float()
 

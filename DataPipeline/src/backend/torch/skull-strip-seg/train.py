@@ -47,85 +47,6 @@ def iou_score(pred, target):
     iou = intersection / (union + 1e-7)
     return iou
 
-# Simple Training for SimpleUNet3D function
-def simple_train_unet3d(nifti_csv_data, epochs=3):
-    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["mask_index"].tolist(), test_size=0.1)
-
-    print("X_train len = {}".format(len(X_train)))
-    print("X_val len = {}".format(len(X_val)))
-
-    print("Creating brain train & val datasets")
-    
-    brain_train_dataset = BrainMRIDataset(X_train, y_train)
-    brain_val_dataset = BrainMRIDataset(X_val, y_val)
-
-    print("brain_train_dataset len = {}".format(len(brain_train_dataset)))
-    print("brain_val_dataset len = {}".format(len(brain_val_dataset)))
-
-    print("Creating brain train & val dataloaders")
-
-    train_loader = DataLoader(brain_train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=4)
-    val_loader = DataLoader(brain_val_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False)
-
-    print("Creating Skull Strip Seg UNet3D model")
-
-    # in_channels=1 for 1 medical image modality T2-weighted; out_channels=1 for skull vs non-skull
-    unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(DEVICE)
-    # unet3d_model = SimpleUNet().to(device)
-
-    print("Compiling UNet3D with Adam, FocalLoss, IoU, Accuracy")
-
-    # compile model with Adam optimizer, focal loss, metrics
-    bce_criterion = nn.BCEWithLogitsLoss().to(DEVICE)
-    optimizer = optim.Adam(unet3d_model.parameters(), lr=LEARNING_RATE)
-
-    # Define desired variables for tracking best validation performance
-    best_val_loss = float("inf")
-
-    print("Training UNet3D across {} epochs".format(epochs))
-
-    unet3d_model.train()
-    step = 100
-    for epoch in range(epochs):
-        print("Epoch {}: Train across batch_idx and brain_data and target from train_loader".format(epoch))
-        for batch_idx, (brain_data, target) in enumerate(train_loader):
-            brain_data = brain_data.to(DEVICE)
-            target = target.to(DEVICE)
-            print("batch_idx = {}; brain_data len = {}; target len = {}".format(batch_idx, len(brain_data), len(target)))
-            
-            optimizer.zero_grad()
-            outputs = unet3d_model(brain_data.unsqueeze(1))
-            loss = bce_criterion(outputs, target.unsqueeze(1))
-            loss.backward()
-            optimizer.step()
-
-        print("Running Evaluation")
-
-        # validation
-        unet3d_model.eval()
-        val_loss = 0.0
-        with torch.no_grad():
-            for val_brain_data, val_target in val_loader:
-                val_brain_data = val_brain_data.to(DEVICE)
-                val_target = val_target.to(DEVICE)
-
-                val_output = unet3d_model(val_brain_data.unsqueeze(1))
-                val_loss += bce_criterion(val_output, val_target.unsqueeze(1))
-        
-        # Calculate average validation loss and IoU score
-        val_loss /= len(val_loader)
-
-        # Update best validation performance and save model if it improves
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
-            torch.save(unet3d_model.state_dict(), "best_unet3d_model_loss_{}.pt".format(step))
-
-        print(f"--------------------Epoch {epoch+1}: Train Loss: {loss:.4f} | Val Loss: {val_loss:.4f}")
-
-        step += 100
-
-        unet3d_model.train()
-
 def train_unet3d(train_loader, model, optimizer, loss_fn, scaler):
     train_loop = tqdm(train_loader)
 
@@ -308,7 +229,7 @@ def save_predictions_as_seg_slices(loader, model, dataset_name, folder="saved_se
 
 
 def advanced_train_unet3d(nifti_csv_data, dataset_name="icpsr"):
-    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["mask_index"].tolist(), test_size=0.1)
+    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["skull_mask_index"].tolist(), test_size=0.3)
 
     if DEBUG:
         print("X_train len = {}".format(len(X_train)))
@@ -343,9 +264,9 @@ def advanced_train_unet3d(nifti_csv_data, dataset_name="icpsr"):
     bce_criterion = nn.BCEWithLogitsLoss().to(device=DEVICE)
 
     step = 100
-    if LOAD_MODEL:
-        load_checkpoint(torch.load("best_unet3d_model_loss_{}.pt".format(step)), unet3d_model)
-        check_accuracy(val_loader, unet3d_model, device=DEVICE)
+    # if LOAD_MODEL:
+    #     load_checkpoint(torch.load("best_unet3d_model_loss_{}.pt".format(step)), unet3d_model)
+    #     check_accuracy(val_loader, unet3d_model, device=DEVICE)
 
     # accuracy = torchmetrics.Accuracy(task="binary").to(device=DEVICE)
     # (num_classes=2 for skull vs non-skull
@@ -481,11 +402,6 @@ def icpsr_skull_strip_seg_unet_training():
     nifti_csv_df = pd.read_csv("icpsr/prep/icpsr_skull_strip_seg_prep.csv")
     advanced_train_unet3d(nifti_csv_df, dataset_name="icpsr")
 
-
-def simple_skull_strip_seg_unet_training():
-    nifti_csv_df = pd.read_csv("nfbs_skull_strip_seg_prep.csv")
-    simple_train_unet3d(nifti_csv_df, epochs=2)
-
 def test_unet():
     # Note: I get an out of gpu memory issue if I use gpu device, it was probably due to not properly handling batches
     # For now use CPU here
@@ -510,5 +426,5 @@ def test_unet():
 if __name__ == "__main__":
     # test_unet()
     # simple_skull_strip_seg_unet_training()
-    nfbs_skull_strip_seg_unet_training()
-    # icpsr_skull_strip_seg_unet_training()
+    # nfbs_skull_strip_seg_unet_training()
+    icpsr_skull_strip_seg_unet_training()
