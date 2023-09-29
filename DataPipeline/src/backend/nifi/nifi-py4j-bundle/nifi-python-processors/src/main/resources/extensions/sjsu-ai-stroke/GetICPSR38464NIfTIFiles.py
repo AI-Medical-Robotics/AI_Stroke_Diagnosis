@@ -42,6 +42,9 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
     def onScheduled(self, context):
         self.logger.info("Initilializing ICPSR38464 Dataset Filepath Lists")
         self.brain_dwi_orig = list()
+        self.brain_adc_orig = list()
+        self.brain_bo_orig = list()
+
         self.brain_dwi_mask = list()
  
         # Stroke Lesion Segmentation Files
@@ -60,6 +63,9 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
         for subdir, dirs, files in os.walk(self.icpsr_base_path):
             # self.logger.info("subdir = {}".format(subdir))
             brain_dwi_orig_single = list()
+            brain_adc_orig_single = list()
+            brain_bo_orig_single = list()
+            
             brain_dwi_mask_single = list()
             stroke_dwi_mask_single = list()
 
@@ -67,27 +73,45 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
                 filepath = subdir + os.sep + file
                 
                 if filepath.endswith(".gz"):
-                    if "desc-brain_mask.nii.gz" in filepath:
-                        brain_dwi_mask_single.append(filepath)
-                        # self.brain_dwi_mask.append(filepath)
-                        self.logger.info("filepath = {}".format(filepath))
-                    elif "DWI_space-orig.nii.gz" in filepath:
+                    if "DWI_space-orig.nii.gz" in filepath:
+                        # Right now DWI, so 1 channel, but we can later bring in 3 channels with ADC and BO
                         brain_dwi_orig_single.append(filepath)
+                        self.logger.info("filepath = {}".format(filepath))
+                    elif "ADC_space-orig.nii.gz" in filepath:
+                        # Right now DWI, so 1 channel, but we can later bring in 3 channels with ADC and BO
+                        brain_adc_orig_single.append(filepath)
                         # self.brain_dwi_orig.append(filepath)
                         self.logger.info("filepath = {}".format(filepath))
+                    elif "B0_space-orig.nii.gz" in filepath:
+                        # Right now DWI, so 1 channel, but we can later bring in 3 channels with ADC and BO
+                        brain_bo_orig_single.append(filepath)
+                        # self.brain_dwi_orig.append(filepath)
+                        self.logger.info("filepath = {}".format(filepath))
+                    elif "desc-brain_mask.nii.gz" in filepath:
+                        # Get brain mask for skull stripping segmentation prep, training and deployment
+                        brain_dwi_mask_single.append(filepath)
+                        self.logger.info("filepath = {}".format(filepath))
                     elif "desc-stroke_mask.nii.gz" in filepath:
+                        # Get stroke mask for stroke lesion segmentation prep, training and deployment
                         stroke_dwi_mask_single.append(filepath)
                         # self.stroke_dwi_mask.append(filepath)
                         self.logger.info("filepath = {}".format(filepath))
 
-            if len(brain_dwi_mask_single) == 1 and len(brain_dwi_orig_single) == 1 and len(stroke_dwi_mask_single) == 1:
+            if len(brain_dwi_orig_single) == 1 and len(brain_adc_orig_single) == 1 and len(brain_bo_orig_single) == 1 and len(brain_dwi_mask_single) == 1 and len(stroke_dwi_mask_single) == 1:
                 self.brain_dwi_orig.extend(brain_dwi_orig_single)
+                self.brain_adc_orig.extend(brain_adc_orig_single)
+                self.brain_bo_orig.extend(brain_bo_orig_single)
+
                 self.brain_dwi_mask.extend(brain_dwi_mask_single)
                 self.stroke_dwi_mask.extend(stroke_dwi_mask_single)
-            elif len(brain_dwi_mask_single) != 1:
-                self.logger.info("brain_dwi_mask_single didnt equal 1; it equals = {}".format(len(brain_dwi_mask_single)))
             elif len(brain_dwi_orig_single) != 1:
                 self.logger.info("brain_dwi_orig_single didnt equal 1; it equals = {}".format(len(brain_dwi_orig_single)))
+            elif len(brain_adc_orig_single) != 1:
+                self.logger.info("brain_adc_orig_single didnt equal 1; it equals = {}".format(len(brain_adc_orig_single)))
+            elif len(brain_bo_orig_single) != 1:
+                self.logger.info("brain_bo_orig_single didnt equal 1; it equals = {}".format(len(brain_bo_orig_single)))
+            elif len(brain_dwi_mask_single) != 1:
+                self.logger.info("brain_dwi_mask_single didnt equal 1; it equals = {}".format(len(brain_dwi_mask_single)))
             elif len(stroke_dwi_mask_single) != 1:
                 self.logger.info("stroke_dwi_mask_single didnt equal 1; it equals = {}".format(len(stroke_dwi_mask_single)))
             else:
@@ -95,9 +119,11 @@ class GetICPSR38464NIfTIFiles(FlowFileTransform):
             
 
 
-        self.logger.info("Creating icpsr_df: brain_dwi_orig, brain_dwi_mask, stroke_dwi_mask")
+        self.logger.info("Creating icpsr_df: brain_dwi_orig, brain_adc_orig, brain_bo_orig, brain_dwi_mask, stroke_dwi_mask")
         self.icpsr_df = pd.DataFrame(
             {"brain_dwi_orig": self.brain_dwi_orig,
+            "brain_adc_orig": self.brain_adc_orig,
+            "brain_bo_orig": self.brain_bo_orig,
             "brain_dwi_mask": self.brain_dwi_mask,
             "stroke_dwi_mask": self.stroke_dwi_mask
             }
