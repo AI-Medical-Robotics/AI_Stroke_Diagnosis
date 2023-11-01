@@ -60,7 +60,7 @@ class SaveITKImageSlice(FlowFileTransform):
         )
         self.nifti_csv_col = PropertyDescriptor(
             name = 'NifTI CSV Column Name',
-            description = 'The name of the NifTI Data Prep section you want to see an image slice from. Examples: get_nifti, correct_bias, resize_crop, intensity_norm, etc',
+            description = 'The name of the NifTI Data Prep section you want to see an image slice from. Examples: get_nifti, correct_bias, resize, intensity_norm, etc',
             default_value = 'get_nifti',
             required = True
         )
@@ -108,26 +108,40 @@ class SaveITKImageSlice(FlowFileTransform):
                 nifti_stroke_mask = itk.imread(nifti_csv.stroke_dwi_mask.iloc[nifti_index])
         elif self.nifti_csv_col_name == "correct_bias":
             nifti_voxel = itk.imread(nifti_csv.bias_corr.iloc[nifti_index], itk.F)
-            if self.nifti_data_name == "nfbs":
-                nifti_skull_mask = itk.imread(nifti_csv.brain_mask.iloc[nifti_index], itk.UC)
-            elif self.nifti_data_name == "icpsr_stroke":
-                nifti_skull_mask = itk.imread(nifti_csv.brain_dwi_mask.iloc[nifti_index])
-                nifti_stroke_mask = itk.imread(nifti_csv.stroke_dwi_mask.iloc[nifti_index])
-        elif self.nifti_csv_col_name == "resize_crop":
+            if self.nifti_data_name == "nfbs" or self.nifti_data_name == "icpsr_stroke":
+                nifti_skull_mask = itk.imread(nifti_csv.skull_mask_index.iloc[nifti_index])
+                # nifti_skull_mask = itk.imread(nifti_csv.brain_dwi_mask.iloc[nifti_index])
+            if self.nifti_data_name == "icpsr_stroke":
+                # nifti_stroke_mask = itk.imread(nifti_csv.stroke_dwi_mask.iloc[nifti_index])
+                nifti_stroke_mask = itk.imread(nifti_csv.stroke_mask_index.iloc[nifti_index])
+        elif self.nifti_csv_col_name == "resize":
             nifti_voxel = itk.imread(nifti_csv.raw_index.iloc[nifti_index], itk.F)
             if self.nifti_data_name == "nfbs" or self.nifti_data_name == "icpsr_stroke":
-                nifti_skull_mask = itk.imread(nifti_csv.skull_mask_index.iloc[nifti_index], itk.UC)
+                nifti_skull_mask = itk.imread(nifti_csv.skull_mask_index.iloc[nifti_index])
+                # nifti_skull_mask = itk.imread(nifti_csv.brain_dwi_mask.iloc[nifti_index])
             if self.nifti_data_name == "icpsr_stroke":
-                nifti_stroke_mask = itk.imread(nifti_csv.stroke_mask_index.iloc[nifti_index], itk.UC)
+                nifti_stroke_mask = itk.imread(nifti_csv.stroke_mask_index.iloc[nifti_index])
+                # nifti_stroke_mask = itk.imread(nifti_csv.stroke_dwi_mask.iloc[nifti_index])
         elif self.nifti_csv_col_name == "intensity_norm":
             # self.logger.info("Reading intensity_norm voxel ID {} taking 1 2D slice example per voxel".format(nifti_index))
             nifti_voxel = itk.imread(nifti_csv.intensity_norm.iloc[nifti_index], itk.F)
             if self.nifti_data_name == "nfbs" or self.nifti_data_name == "icpsr_stroke":
-                nifti_skull_mask = itk.imread(nifti_csv.skull_mask_index.iloc[nifti_index], itk.UC)
+                nifti_skull_mask = itk.imread(nifti_csv.skull_mask_index.iloc[nifti_index])
+                # nifti_skull_mask = itk.imread(nifti_csv.brain_dwi_mask.iloc[nifti_index])
             if self.nifti_data_name == "icpsr_stroke":
-                nifti_stroke_mask = itk.imread(nifti_csv.stroke_mask_index.iloc[nifti_index], itk.UC)
+                nifti_stroke_mask = itk.imread(nifti_csv.stroke_mask_index.iloc[nifti_index])
+                # nifti_stroke_mask = itk.imread(nifti_csv.stroke_dwi_mask.iloc[nifti_index])
 
         return nifti_voxel, nifti_skull_mask, nifti_stroke_mask
+
+    def itk_save(self, output_image, voxel_name, mri_slice_id, mri_idx):
+        self.mkdir_prep_dir(self.saved_img_dirpath)
+        output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(mri_idx, mri_slice_id, voxel_name, "png")
+        output_filepath = os.path.join(self.saved_img_dirpath, "mri_".format(mri_idx), output_filename)
+
+        # Write the resampled image using ITK
+        itk.imwrite(output_image, output_filepath)      
+        return output_filepath
 
     def plot_nfbs(self, nifti_csv, nifti_index):
         nifti_voxel, nifti_skull_mask, _ = self.load_itk_from_nifti(nifti_csv, nifti_index)
@@ -137,16 +151,21 @@ class SaveITKImageSlice(FlowFileTransform):
 
         # Create a figure and axis for visualization
         fig, ax = plt.subplots(2, 1, figsize=(14, 10))
+        mri_slice_id = nifti_voxel_array.shape[0]//self.nifti_image_divisor
+        nifti_raw_2d_slice = nifti_voxel_array[mri_slice_id]
         ax[0].set_title("{} NifTI {} 2D Image ID {} Slice = {}".format(self.nifti_csv_col_name, nifti_index, self.nifti_data_name, nifti_voxel_array.shape))
-        # Display the 2D image slice
-        ax[0].imshow(nifti_voxel_array[nifti_voxel_array.shape[0]//self.nifti_image_divisor])
+        ax[0].imshow(nifti_raw_2d_slice)
+        # self.itk_save(nifti_raw_2d_slice, "raw", mri_slice_id, nifti_index)
 
+        mri_slice_id = nifti_skull_mask_array.shape[0]//self.nifti_image_divisor
+        nifti_skull_mask_2d_slice = nifti_skull_mask_array[mri_slice_id]
         ax[1].set_title("{} NifTI {} 2D Image ID {} Mask Slice = {}".format(self.nifti_csv_col_name, nifti_index, self.nifti_data_name, nifti_skull_mask_array.shape))
-        ax[1].imshow(nifti_skull_mask_array[nifti_skull_mask_array.shape[0]//self.nifti_image_divisor])
+        ax[1].imshow(nifti_skull_mask_2d_slice)
+        # self.itk_save(nifti_skull_mask_2d_slice, "skull_mask", mri_slice_id, nifti_index)
 
         # Save the 2D image slice as file
         saved_itk_image_dir = self.mkdir_prep_dir(self.saved_img_dirpath)
-        output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(nifti_index, nifti_voxel_array.shape[0]//self.nifti_image_divisor, self.nifti_csv_col_name, "png")
+        output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(nifti_index, mri_slice_id, self.nifti_csv_col_name, "png")
         output_filepath = os.path.join(saved_itk_image_dir, output_filename)
         self.logger.info("Saving Image to path = {}".format(output_filepath))
         plt.savefig(output_filepath)
@@ -160,19 +179,28 @@ class SaveITKImageSlice(FlowFileTransform):
 
         # Create a figure and axis for visualization
         fig, ax = plt.subplots(3, 1, figsize=(14, 10))
+        mri_slice_id = nifti_voxel_array.shape[0]//self.nifti_image_divisor
+        nifti_raw_2d_slice = nifti_voxel_array[mri_slice_id]
         ax[0].set_title("{} NifTI {} 2D Image ID {} Brain Slice = {}".format(self.nifti_csv_col_name, nifti_index, self.nifti_data_name, nifti_voxel_array.shape))
-        # Display the 2D image slice
-        ax[0].imshow(nifti_voxel_array[nifti_voxel_array.shape[0]//self.nifti_image_divisor])
+        ax[0].imshow(nifti_raw_2d_slice)
+        # self.itk_save(nifti_raw_2d_slice, "raw", mri_slice_id, nifti_index)
 
+        mri_slice_id = nifti_skull_mask_array.shape[0]//self.nifti_image_divisor
+        nifti_skull_mask_2d_slice = nifti_skull_mask_array[mri_slice_id]
         ax[1].set_title("{} NifTI {} 2D Image ID {} Skull Mask Slice = {}".format(self.nifti_csv_col_name, nifti_index, self.nifti_data_name, nifti_skull_mask_array.shape))
-        ax[1].imshow(nifti_skull_mask_array[nifti_skull_mask_array.shape[0]//self.nifti_image_divisor])
+        ax[1].imshow(nifti_skull_mask_2d_slice)
+        # self.itk_save(nifti_skull_mask_2d_slice, "skull_mask", mri_slice_id, nifti_index)
 
+        mri_slice_id = nifti_stroke_mask_array.shape[0]//self.nifti_image_divisor
+        nifti_lesion_mask_2d_slice = nifti_stroke_mask_array[mri_slice_id]
         ax[2].set_title("{} NifTI {} 2D Image ID {} Stroke Mask Slice = {}".format(self.nifti_csv_col_name, nifti_index, self.nifti_data_name, nifti_stroke_mask_array.shape))
-        ax[2].imshow(nifti_stroke_mask_array[nifti_stroke_mask_array.shape[0]//self.nifti_image_divisor])
+        ax[2].imshow(nifti_lesion_mask_2d_slice)
+        # self.itk_save(nifti_lesion_mask_2d_slice, "lesion_mask", mri_slice_id, nifti_index)
+
 
         # Save the 2D image slice as file
         saved_itk_image_dir = self.mkdir_prep_dir(self.saved_img_dirpath)
-        output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(nifti_index, nifti_voxel_array.shape[0]//self.nifti_image_divisor, self.nifti_csv_col_name, "png")
+        output_filename = "nifti_image_id_{}_slice_{}_{}.{}".format(nifti_index, mri_slice_id, self.nifti_csv_col_name, "png")
         output_filepath = os.path.join(saved_itk_image_dir, output_filename)
         self.logger.info("Saving Image to path = {}".format(output_filepath))
         plt.savefig(output_filepath)
@@ -182,7 +210,7 @@ class SaveITKImageSlice(FlowFileTransform):
         # Read FlowFile contents into an image
         nifti_csv = pd.read_csv(io.BytesIO(flowFile.getContentsAsBytes()))
 
-        # if self.nifti_csv_col_name == "get_nifti" or self.nifti_csv_col_name == "correct_bias" or self.nifti_csv_col_name == "resize_crop" or self.nifti_csv_col_name == "intensity_norm":
+        # if self.nifti_csv_col_name == "get_nifti" or self.nifti_csv_col_name == "correct_bias" or self.nifti_csv_col_name == "resize" or self.nifti_csv_col_name == "intensity_norm":
         # TODO (JG): Now for ICPSR, we have raw brain, skull and stroke lesion preprocessed MRIs, update this section 
         fraction_length = int(len(nifti_csv) * self.nifti_percent_slices_save)
         for nifti_index in tqdm(range(fraction_length)):
