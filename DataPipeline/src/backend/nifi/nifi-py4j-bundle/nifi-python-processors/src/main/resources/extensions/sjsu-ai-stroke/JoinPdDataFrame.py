@@ -97,6 +97,9 @@ class JoinPdDataFrame(FlowFileTransform):
         self.logger.info("Joining Image Captions DF & Image Features DF")
 
         joined_df = pd.merge(img_cap_csv_data, img_fet_csv_data, on=self.col_join_df_on)
+        
+        # Drop any rows not in both source data frames
+        joined_df.dropna(inplace=True)
 
         return joined_df
 
