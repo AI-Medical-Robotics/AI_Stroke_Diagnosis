@@ -22,7 +22,7 @@ import torchmetrics
 from torchmetrics import Accuracy
 from focal_loss.focal_loss import FocalLoss
 
-from torch_model import SimpleUNet3D
+from torch_model import SimpleUNet3D, AttSEUNet3D
 from brain_dataset import StrokeMRIDataset
 
 # Reference perplexity.ai for pytorch 3D UNet skull strip seg model
@@ -38,8 +38,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 2
-DEBUG = True
+NUM_EPOCHS = 10
+DEBUG = False
 TRAINING_TASKNAME = "Stroke Lesion Segmentation"
 
 def iou_score(pred, target):
@@ -233,7 +233,8 @@ def save_predictions_as_seg_slices(loader, model, dataset_name, folder="saved_se
 def advanced_train_unet3d(nifti_csv_data, dataset_name="icpsr"):
     # TODO (JG): Check if I need to do preprocessing on "stroke_dwi_mask", I think we did this for "mask_index"
     # stroke_dwi_mask. Updated NiFi ResizeCropITKImage Py Processor and ExecuteDNNSkullStrippingSegmentation Processor
-    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["skull_strip_seg"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.1)
+    # X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["skull_strip_seg"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.1)
+    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.3)
 
     if DEBUG:
         print("X_train len = {}".format(len(X_train)))
@@ -257,7 +258,9 @@ def advanced_train_unet3d(nifti_csv_data, dataset_name="icpsr"):
     print("Creating Stroke Lesion Seg UNet3D model")
 
     # in_channels=1 for 1 medical image modality T2-weighted; out_channels=1 for skull vs non-skull
-    unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
+    # unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
+
+    unet3d_model = AttSEUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
 
     print("Compiling UNet3D with Adam, BCEWithLogitsLoss, Dice Score, Accuracy")
 
