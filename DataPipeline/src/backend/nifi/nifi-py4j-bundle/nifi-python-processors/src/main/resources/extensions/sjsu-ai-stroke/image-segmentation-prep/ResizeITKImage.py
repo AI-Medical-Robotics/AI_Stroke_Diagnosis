@@ -23,29 +23,28 @@ from nifiapi.properties import PropertyDescriptor
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 from py4j.java_collections import ListConverter
 
-# TODO (JG): Resize and Crop SimpleITK not working as expected like nilearn resample_img(), testing
-
 # TODO (JG): Make this work for training and testing sets
-class ResizeCropITKImage(FlowFileTransform):
+# Also referenced perplexity.ai (GPT-3) at url: 
+class ResizeITKImage(FlowFileTransform):
     class Java:
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['SimpleITK==2.2.1', 'pandas==1.3.5', 'tqdm==4.66.1']
-        description = 'Gets the corrected bias field NIfTI filepaths from the pandas csv dataframe in the flow file, loads each NIfTI file as an ITK voxel and performs SimpleITK resizing and cropping on each 3D NIfTI voxel'
+        description = 'Gets the NIfTI filepaths from the pandas csv dataframe in the flow file, loads each NIfTI file as an ITK voxel and performs SimpleITK resizing on each 3D NIfTI voxel'
         tags = ['sjsu_ms_ai', 'csv', 'itk', 'nifti']
 
     def __init__(self, **kwargs):
         # Build Property Descriptors
-        self.rescrop_dir = PropertyDescriptor(
-            name = 'ITK Resized Cropped Folder Path',
-            description = 'The folder to stored the ITK Preprocessed Resized & Cropped Images.',
-            default_value="{}/src/datasets/NFBS_Dataset_NiFi/{}".format(os.path.expanduser("~"), "resized_cropped"),
+        self.res_dir = PropertyDescriptor(
+            name = 'ITK Resized Folder Path',
+            description = 'The folder to stored the ITK Preprocessed Resized Images.',
+            default_value="{}/src/datasets/NFBS_Dataset_NiFi/{}".format(os.path.expanduser("~"), "resized"),
             required = True
         )
         self.already_prepped = PropertyDescriptor(
-            name = 'Already Resized Cropped',
-            description = 'If ITK Resized & Cropped Already Performed, then just get filepaths',
+            name = 'Already Resized',
+            description = 'If ITK Resized Already Performed, then just get filepaths',
             default_value=False,
             required = True,
         )
@@ -56,19 +55,19 @@ class ResizeCropITKImage(FlowFileTransform):
             required=True
         )
         self.spacing_resolution = PropertyDescriptor(
-            name = 'Resize Spacing Resolution',
+            name = 'Resize Spacing Resolution (mm)',
             description = 'Control the spacing resolution for NIfTI voxels to resize to be large (< 2) or small (> 2)',
             default_value = "1.0",
             required=True
         )
         self.dimensions = PropertyDescriptor(
-            name = 'Resize Crop Target Dimensions',
-            description = 'Set the resize crop target dimensions {width, height, depth} for NIfTI voxels',
-            default_value = """{"width": 128, "height": 128, "depth": 96}""",
-            required=True
+            name = 'Resize Target Dimensions',
+            description = 'Set the resize target dimensions {width, height, depth} for NIfTI voxels',
+            default_value = """{"width": 96, "height": 112, "depth": 48}""",
+            required=False
         )
         self.expected_dim_keys = ['width', 'height', 'depth']
-        self.descriptors = [self.rescrop_dir, self.already_prepped, self.nifti_data_type, self.spacing_resolution, self.dimensions]
+        self.descriptors = [self.res_dir, self.already_prepped, self.nifti_data_type, self.spacing_resolution, self.dimensions]
 
     def getPropertyDescriptors(self):
         return self.descriptors
@@ -77,12 +76,12 @@ class ResizeCropITKImage(FlowFileTransform):
         return {"true": True, "false": False}.get(string_input.lower())
 
     def onScheduled(self, context):
-        self.logger.info("Getting properties for rescrop_dirpath, etc")
+        self.logger.info("Getting properties for res_dirpath, etc")
         self.raw_index = list()
         self.skull_mask_index = list()
         # read pre-trained model and config file
-        self.rescrop_dirpath = context.getProperty(self.rescrop_dir.name).getValue()
-        self.already_rescropped = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
+        self.res_dirpath = context.getProperty(self.res_dir.name).getValue()
+        self.already_res = self.str_to_bool(context.getProperty(self.already_prepped.name).getValue())
         self.nifti_data_name = context.getProperty(self.nifti_data_type.name).getValue()
         self.resample_spacing_resolution = context.getProperty(self.spacing_resolution.name).asFloat()
         self.target_dims_json_str = context.getProperty(self.dimensions.name).getValue()
@@ -97,53 +96,54 @@ class ResizeCropITKImage(FlowFileTransform):
             os.makedirs(prep_dir)
         return prep_dir
 
-    def sitk_resample_crop(self, input_image, new_affine, target_shape, new_resolution):
-        # Resample and crop the image uisng ITK
+    def sitk_resample(self, input_image, new_resolution):
+        self.logger.info("sitk_resample:")
+        # Calculate new image size based on new voxel size (replaces target_shape)
+            # multiply voxel size by voxel spacing divided by new resolution spacing size 
+        new_size = [int(sz*spc/ns) for sz,spc,ns in zip(input_image.GetSize(), input_image.GetSpacing(), new_resolution)]
+        self.logger.info("new_size len = {}".format(len(new_size)))
+        self.logger.info("new_size list = {}".format(new_size))
+
+        # Define the resampling filter
         resampler = sitk.ResampleImageFilter()
-        resampler.SetSize(target_shape)
-        # resampler.SetReferenceImage(input_image)
+        resampler.SetSize(new_size)
         resampler.SetOutputSpacing(new_resolution)
-        # resampler.SetOutputOrigin(sitk.VectorDouble(new_affine.GetTranslation()))
         resampler.SetOutputOrigin(input_image.GetOrigin())
-        # resampler.SetOutputDirection(new_affine.GetMatrix())
         resampler.SetOutputDirection(input_image.GetDirection())
 
-        # offset = (2, 2, 2)
-        # new_output_origin = tuple(new_affine.GetTranslation()) + offset
-        # resampler.SetOutputOrigin(sitk.VectorDouble(new_output_origin))
-
-        
-        resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+        # resampler.SetInterpolator(sitk.sitkNearestNeighbor)
         # resampler.SetTransform(new_affine)
+
+        # Resample the image uisng ITK
         resampled_image = resampler.Execute(input_image)
         return resampled_image
 
     def sitk_save(self, output_image, voxel_name, idx):
-        output_image_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_" + voxel_name + str(idx) + ".nii.gz")
+        output_image_path = os.path.join(self.res_dirpath, self.nifti_data_name + "_" + voxel_name + str(idx) + ".nii.gz")
 
         # Write the resampled image using ITK
         sitk.WriteImage(output_image, output_image_path)      
         return output_image_path
 
-    def itk_resize_crop(self, nifti_csv_data):
-        self.logger.info("Performing SimpleITK Resizing & Cropping")
-        resized_cropped_dir = self.mkdir_prep_dir(self.rescrop_dirpath)
+    def itk_resize(self, nifti_csv_data):
+        self.logger.info("Performing SimpleITK Resizing")
+        self.mkdir_prep_dir(self.res_dirpath)
 
         # In NiFi Python Processor, add property for this
-        self.logger.info("self.already_rescropped type = {}".format(type(self.already_rescropped)))
-        if self.already_rescropped:
-            self.logger.info("Adding Prepped SimpleITK Resized & Cropped filepaths to data df in raw_index & skull_mask_index")
+        self.logger.info("self.already_res type = {}".format(type(self.already_res)))
+        if self.already_res:
+            self.logger.info("Adding Prepped SimpleITK Resized filepaths to data df in raw_index & skull_mask_index")
 
             for i in tqdm(range(len(nifti_csv_data))):
-                self.raw_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_" + "raw" + str(i) + ".nii.gz")
+                self.raw_index.append(self.res_dirpath + os.sep + self.nifti_data_name + "_" + "raw" + str(i) + ".nii.gz")
                 
-                self.skull_mask_index.append(self.rescrop_dirpath + os.sep + self.nifti_data_name + "_skull_" + "mask" + str(i) + ".nii.gz")
+                self.skull_mask_index.append(self.res_dirpath + os.sep + self.nifti_data_name + "_skull_mask" + str(i) + ".nii.gz")
 
                 if self.nifti_data_name == "icpsr_stroke":
-                    output_stroke_mask_path = os.path.join(self.rescrop_dirpath, self.nifti_data_name + "_lesion_" + "mask" + str(i) + ".nii.gz")
+                    output_stroke_mask_path = os.path.join(self.res_dirpath, self.nifti_data_name + "_lesion_mask" + str(i) + ".nii.gz")
                     self.stroke_mask_index.append(output_stroke_mask_path)
 
-            self.logger.info("Retrieved Prepped Resized & Cropped voxel filepaths stored at : {}/".format(resized_cropped_dir))
+            self.logger.info("Retrieved Prepped Resized voxel filepaths stored at : {}/".format(self.res_dirpath))
         else:
             # TODO (JG): Could Add NiFi Properties to set these parameters
             target_dims_dict = json.loads(self.target_dims_json_str)
@@ -151,29 +151,14 @@ class ResizeCropITKImage(FlowFileTransform):
                 if dim_key not in target_dims_dict:
                     self.logger.error("The key '{}' is missing or incorrect in the JSON data.".format(dim_key))
             
-            target_shape = [target_dims_dict['width'], target_dims_dict['height'], target_dims_dict['depth']]
+            # target_shape = [target_dims_dict['width'], target_dims_dict['height'], target_dims_dict['depth']]
             # new_resolution = [2.0, 2.0, 2.0]
             # 2 is larger than 4
+
+            # Defines new voxel size
             new_resolution = [self.resample_spacing_resolution,]*3
             self.logger.info("new_resolution len = {}".format(len(new_resolution)))
             self.logger.info("new_resolution list = {}".format(new_resolution))
-
-            # Create a new affine matrix for resizing and cropping
-            new_affine = sitk.AffineTransform(3)
-            new_affine.SetMatrix([new_resolution[0], 0, 0,
-                                  0, new_resolution[1], 0,
-                                  0, 0, new_resolution[2]])
-            new_affine.SetTranslation([-target_shape[0] * new_resolution[0] / 2,
-                                -target_shape[1] * new_resolution[1] / 2,
-                                -target_shape[2] * new_resolution[2] / 2])
-
-            # Create a homogeneous transformation matrix
-            homogeneous_matrix_tuple = new_affine.GetMatrix()
-            new_affine_matrix_list = list(homogeneous_matrix_tuple)
-            self.logger.info("len(new_affine_matrix_list) = {}".format(len(new_affine_matrix_list)))
-            new_affine_matrix_list[len(new_affine_matrix_list)-1] = 1.0
-            new_affine_matrix__modified = tuple(new_affine_matrix_list)
-            new_affine.SetMatrix(new_affine_matrix__modified)
 
             for i in tqdm(range(len(nifti_csv_data))):
                 if self.nifti_data_name == "nfbs":
@@ -189,21 +174,20 @@ class ResizeCropITKImage(FlowFileTransform):
                     input_stroke_mask = sitk.ReadImage(nifti_csv_data.stroke_dwi_mask.iloc[i])
 
                     # Resample the input stroke mask 3D image using SimpleITK
-                    resampled_stroke_mask = self.sitk_resample_crop(input_stroke_mask, new_affine, target_shape, new_resolution)
-                    output_stroke_mask_path = self.sitk_save(resampled_stroke_mask, "lesion_mask", i)
+                    resampled_stroke_mask = self.sitk_resample(input_stroke_mask, new_resolution)
+                    output_stroke_mask_path = self.sitk_save(resampled_stroke_mask, "_lesion_mask", i)
                     self.stroke_mask_index.append(output_stroke_mask_path)
 
-
                 # Resample the input brain 3D image using SimpleITK
-                resampled_image = self.sitk_resample_crop(input_brain_img, new_affine, target_shape, new_resolution)
+                resampled_image = self.sitk_resample(input_brain_img, new_resolution)
                 output_image_path = self.sitk_save(resampled_image, "raw", i)
                 self.raw_index.append(output_image_path)
 
                 # Resample the input skull mask 3D image using SimpleITK
-                resampled_skull_mask = self.sitk_resample_crop(input_skull_mask, new_affine, target_shape, new_resolution)
-                output_skull_mask_path = self.sitk_save(resampled_skull_mask, "skull_mask", i)
+                resampled_skull_mask = self.sitk_resample(input_skull_mask, new_resolution)
+                output_skull_mask_path = self.sitk_save(resampled_skull_mask, "_skull_mask", i)
                 self.skull_mask_index.append(output_skull_mask_path)
-            self.logger.info("ITK Resized & Cropped voxels stored at: {}/".format(resized_cropped_dir))
+            self.logger.info("ITK Resized voxels stored at: {}/".format(self.res_dirpath))
 
         nifti_csv_data["raw_index"] = self.raw_index
         nifti_csv_data["skull_mask_index"] = self.skull_mask_index
@@ -219,7 +203,7 @@ class ResizeCropITKImage(FlowFileTransform):
         # NIfTI: — Neuroimaging Informatics Technology Initiative
         nifti_csv = pd.read_csv(io.BytesIO(flowFile.getContentsAsBytes()))
         self.logger.info("input: nifti_csv = {}".format(nifti_csv.head()))
-        nifti_csv_prepped = self.itk_resize_crop(nifti_csv)
+        nifti_csv_prepped = self.itk_resize(nifti_csv)
         self.logger.info("output: nifti_csv_prepped = {}".format(nifti_csv_prepped.head()))
 
         # Create a StringIO object

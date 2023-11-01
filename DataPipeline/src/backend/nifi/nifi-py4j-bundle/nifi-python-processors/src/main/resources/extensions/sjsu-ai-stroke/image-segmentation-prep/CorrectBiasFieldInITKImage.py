@@ -93,22 +93,16 @@ class CorrectBiasFieldInITKImage(FlowFileTransform):
         else:
             self.logger.info("Doing the SimpleITK Bias Field Correction From Scratch")
             for i in tqdm(range(len(nifti_csv_data))):
-                # Load the image using ITK
-                if self.nifti_data_name == "nfbs":
-                    input_image = sitk.ReadImage(nifti_csv_data.raw.iloc[i], sitk.sitkFloat32)
-                elif self.nifti_data_name == "atlas":
-                    input_image = sitk.ReadImage(nifti_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-                elif self.nifti_data_name == "icpsr_stroke":
-                    input_image = sitk.ReadImage(nifti_csv_data.brain_dwi_orig.iloc[i], sitk.sitkFloat32)
+                input_image = sitk.ReadImage(nifti_csv_data.raw_index.iloc[i], sitk.sitkFloat32)
 
                 # Set shrink factor to 3
                 # https://simpleitk.readthedocs.io/en/master/link_N4BiasFieldCorrection_docs.html
                 self.logger.info("input_image.GetDimension() = {}".format(input_image.GetDimension()))
 
-                shrink_filter = sitk.ShrinkImageFilter()
-                shrink_filter.SetShrinkFactor(3)
+                # shrink_filter = sitk.ShrinkImageFilter()
+                # shrink_filter.SetShrinkFactor(3)
 
-                shrunk_image = shrink_filter.Execute(input_image)
+                # shrunk_image = shrink_filter.Execute(input_image)
 
                 # Perform N4 bias field correction
                 self.logger.info("Create SimpleITK N4 Bias Field Correction Filter")
@@ -118,7 +112,7 @@ class CorrectBiasFieldInITKImage(FlowFileTransform):
                 corrector.SetMaximumNumberOfIterations([20, 10, 10, 5])
 
                 self.logger.info("Execute SimpleITK N4 Bias Field Correction")
-                corrected_image = corrector.Execute(shrunk_image)
+                corrected_image = corrector.Execute(input_image) # initially, shrink_image
 
                 self.logger.info("Getting corrected_image type = {}".format(type(corrected_image)))
 
