@@ -38,7 +38,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 7
+NUM_EPOCHS = 5
 DEBUG = False
 
 def iou_score(pred, target):
