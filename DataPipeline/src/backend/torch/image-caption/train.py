@@ -142,15 +142,39 @@ def print_examples(voxcap_dnn, voxel_extfets, DEVICE, stroke_vocab, index):
         voxcap_dnn.caption_image(voxel_extfets, stroke_vocab)
     ))
 
-def print_example_v2(voxcap_dnn, voxel_extfets, DEVICE, stroke_vocab, index):
-    # TODO (JG): Grount Truth Captions
-    print(f"Ex {index} MRI Caption Pred: " + " ".join(
-        voxcap_dnn.caption_image(voxel_extfets, stroke_vocab)
-    ))
+# def save_mri_sliced_captions(voxcap_dnn, voxel_extfets, DEVICE, stroke_vocab, index):
+#     # TODO (JG): Grount Truth Captions
+#     print(f"Ex {index} MRI Caption Pred: " + " ".join(
+#         voxcap_dnn.caption_image(voxel_extfets, stroke_vocab)
+#     ))
 
+#     nifti_seg_2d_slice_divisor = 2
+#     nifti_data_type = dataset_name
+#     nifti_csv_col_name = "stroke_mri_sliced_caption"
+
+
+def save_mri_sliced_captions(loader, voxcap_dnn, dataset_name, stroke_vocab, folder="save_mri_sliced_captions"):
+    # nifti_percent_slices_save = 0.025
+    # nifti_filepath_df_row = 0
     nifti_seg_2d_slice_divisor = 2
     nifti_data_type = dataset_name
-    nifti_csv_col_name = "stroke_mri_caption"
+    nifti_csv_col_name = "stroke_mri_sliced_caption"
+
+    with torch.no_grad():
+        for index, (prep_voxel, voxel_captions) in enumerate(loader):
+            # print(f"voxel_captions = {voxel_captions}")
+
+            # print("Setting userprep_voxel, voxel_captions on gpu device")
+            prep_voxel = prep_voxel.to(device=DEVICE)
+            voxel_captions = voxel_captions.to(device=DEVICE)
+
+            # outputs = voxcap_dnn(prep_voxel, voxel_captions[:-1])
+
+            image_caption_pred_list, image_caption_gt_list = voxcap_dnn.caption_image(prep_voxel, stroke_vocab, gt_caption=voxel_captions)
+            image_caption_pred_str = " ".join(image_caption_pred_list)
+            image_caption_gt_str = " ".join(image_caption_gt_list)
+            print(f"Ex {index} MRI Caption Pred: " + image_caption_pred_str + "; MRI Caption GT: " + image_caption_gt_str)
+
 
 
 def validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab):
@@ -178,7 +202,7 @@ def validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab):
 
 
 
-def train_voxcap_over_epochs(voxcap_dnn, optimizer, loss_criterion, step, train_loader, val_loader, stroke_vocab):
+def train_voxcap_over_epochs(voxcap_dnn, optimizer, loss_criterion, step, train_loader, val_loader, stroke_vocab, dataset_name="icpsr"):
     voxcap_dnn.train()
 
     for epoch in range(NUM_EPOCHS):
@@ -195,7 +219,18 @@ def train_voxcap_over_epochs(voxcap_dnn, optimizer, loss_criterion, step, train_
         filename="icpsr/models/cnn3d_rnn_voxcap_{}.pth.tar".format(step)
         save_checkpoint(checkpoint, filename=filename)
 
-        validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab)
+        # validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab)
+
+def qual_eval_voxcap(voxcap_dnn, step, val_loader, stroke_vocab, dataset_name="icpsr"):
+    voxcap_dnn.eval()
+
+    # for epoch in range(NUM_EPOCHS):
+
+    model_filepath = "/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/image-caption/icpsr/models/cnn3d_rnn_voxcap_2041.pth.tar"
+        
+    load_checkpoint(torch.load(model_filepath), voxcap_dnn)
+
+    save_mri_sliced_captions(val_loader, voxcap_dnn, dataset_name, stroke_vocab, folder="{}/save_mri_sliced_captions/{}".format(dataset_name, step))
 
 def plot_cnn3d_rnn_loss_curve(ce_loss_values, plot_title, plot_filename):
     plt.title(plot_title)
@@ -255,10 +290,12 @@ def train_stroke_mri_captioning(nifti_csv_data, dataset_name="icpsr"):
     torch.backends.cudnn.benchmark = True
     load_model = False
 
-    if load_model:
-        step = load_checkpoint(torch.load("cnn3d_rnn_voxcap_{}.pth.tar"), model, optimizer)
+    # if load_model:
+    #     step = load_checkpoint(torch.load("cnn3d_rnn_voxcap_{}.pth.tar"), model, optimizer)
 
-    train_voxcap_over_epochs(model, optimizer, criterion, step, train_loader, val_loader, stroke_vocab)
+    # train_voxcap_over_epochs(model, optimizer, criterion, step, train_loader, val_loader, stroke_vocab)
+
+    qual_eval_voxcap(model, step, val_loader, stroke_vocab)
 
     mkdir_prep_dir("icpsr/models/loss_curves/")
     plot_cnn3d_rnn_loss_curve(train_ce_loss_values, "CNN3DToLSTM Train Loss Curve", "icpsr/models/loss_curves/cnn3d_to_lstm_train_loss_curve.jpg")

@@ -203,26 +203,42 @@ class CNN3DtoRNN(nn.Module):
         outputs = self.decoderRNN(features, captions)
         return outputs
 
-    def caption_image(self, image, vocabulary, max_length=50):
+    def caption_image(self, image, vocabulary, gt_caption=None, max_length=50):
         result_caption = []
+        image_caption_gt = []
 
         with torch.no_grad():
             x = self.encoderCNN3D(image).unsqueeze(0)
-            print(f"x = {x}")
+            # print(f"x.shape = {x.shape}")
             states = None
 
             for _ in range(max_length):
                 hiddens, states = self.decoderRNN.lstm(x, states)
-                print(f"after decoderRNN: hidden = {hiddens}; states = {hiddens}")
+                # print(f"after decoderRNN: hiddens.shape = {hiddens.shape}")
+                # print(f"after decoderRNN: states = {states}")
                 output = self.decoderRNN.linear(hiddens.squeeze(0))
-                print(f"after decoderRNN linear: output = {output}")
+                # print(f"after decoderRNN linear: output.shape = {output.shape}")
                 predicted = output.argmax(1)
-                print(f"after argmax(1) pred = {predicted}")
+                # print(f"after argmax(1) pred = {predicted}")
 
                 result_caption.append(predicted.item())
                 x = self.decoderRNN.embed(predicted).unsqueeze(0)
-                print(f"after decoderRNN embed: x = {x}")
+                # print(f"after decoderRNN embed: x.shape = {x.shape}")
 
                 if vocabulary.itos[predicted.item()] == "<EOS>":
                     break
-        return [vocabulary.itos[idx] for idx in result_caption]
+        
+        image_caption_pred = [vocabulary.itos[idx] for idx in result_caption]
+        if gt_caption is None:
+            return image_caption_pred
+        
+        # print(f"vocabulary.itos = {vocabulary.itos}")
+        # print(f"gt_caption.tolist() = {gt_caption.tolist()}")
+
+        for idx in gt_caption.tolist():
+            # print(f"idx[0] = {idx[0]}")
+            # print(f"vocabulary.itos[idx[0]] = {vocabulary.itos[idx[0]]}")
+            image_caption_gt.append(vocabulary.itos[idx[0]])
+
+
+        return image_caption_pred, image_caption_gt
