@@ -17,6 +17,7 @@ from torchtext.vocab import build_vocab_from_iterator
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 from voxel_cap_model import CNN3DtoRNN
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -31,15 +32,19 @@ from utils import save_checkpoint, load_checkpoint, print_examples
 
 from mri_cap_dataset import StrokeMRIVocabulary, StrokeMRICapDataset, MRICapCollate
 
+from nltk.translate.bleu_score import corpus_bleu
+
 # Hyperparameters
 LEARNING_RATE = 1e-1
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 1
+NUM_EPOCHS = 2
 DEBUG = False
 TRAINING_TASKNAME = "Stroke Lesion MRI Captioning"
+
+USE_PRETRAINED_MODEL=False
 
 # Hyperparameters
 embed_size = 256
@@ -50,6 +55,9 @@ learning_rate = 3e-4
 # Loss values for loss curve
 train_ce_loss_values = []
 val_ce_loss_values = []
+
+train_bleu_score_values = []
+val_bleu_score_values = []
 
 def mkdir_prep_dir(dirpath):
     """make preprocess directory if doesn't exist"""
@@ -92,11 +100,33 @@ def get_captions_max(all_captions):
     return max(len(caption) for caption in all_captions)
 
 
+def calc_bleu_score(caption_pred, caption_gt):
+    # gather tokens in torch tensors for caption pred and gt, 
+    # store them into list, compute bleu score
+    caption_gt_list = []
+    caption_pred_list = []
 
+    count = 0
+
+    print(f"caption_gt.tolist() = {caption_gt.tolist()}")
+    print(f"caption_pred.tolist() = {caption_pred.tolist()}")
+
+    for gt_idx in caption_gt.tolist():
+        caption_gt_list.append(gt_idx[0])
+
+    for pred_idx in caption_pred.tolist():
+        caption_pred_list.append(pred_idx[0])
+
+    bleu_score = nltk.translate.bleu_score.corpus_bleu([caption_gt_list], [caption_pred_list])
+    print(f"BLEU Score: {bleu_score}")
+    return bleu_score
 
 def train_cnn3d_rnn(train_loader, voxcap_dnn, optimizer, loss_criterion, step):
 
     train_loop = tqdm(train_loader)
+
+    train_loss_values = []
+    train_bleu_scores = []
 
     print("Running train_cnn3d_rnn")
     for batch_idx, (prep_voxel, voxel_captions) in enumerate(train_loop):
@@ -115,15 +145,21 @@ def train_cnn3d_rnn(train_loader, voxcap_dnn, optimizer, loss_criterion, step):
         # print(f"voxcap_dnn outputs.shape = {outputs.shape}")
         loss = loss_criterion(outputs.reshape(-1, outputs.shape[2]), voxel_captions.reshape(-1))
 
+        train_bleu_score = calc_bleu_score(outputs.reshape(-1, outputs.shape[2]), voxel_captions.reshape(-1))
+
         loss.backward(loss)
         optimizer.step()
 
-        train_ce_loss_values.append(loss.item())
+        train_loss_values.append(loss.item())
+        train_bleu_scores.append(train_bleu_score)
 
         # update tqdm loop
         train_loop.set_postfix(train_ce_loss=loss.item())
 
         step += 1
+
+    train_ce_loss_values.append(min(train_loss_values))
+    train_bleu_score_values.append(min(train_bleu_scores))
 
     return step
 
@@ -142,23 +178,13 @@ def print_examples(voxcap_dnn, voxel_extfets, DEVICE, stroke_vocab, index):
         voxcap_dnn.caption_image(voxel_extfets, stroke_vocab)
     ))
 
-# def save_mri_sliced_captions(voxcap_dnn, voxel_extfets, DEVICE, stroke_vocab, index):
-#     # TODO (JG): Grount Truth Captions
-#     print(f"Ex {index} MRI Caption Pred: " + " ".join(
-#         voxcap_dnn.caption_image(voxel_extfets, stroke_vocab)
-#     ))
-
-#     nifti_seg_2d_slice_divisor = 2
-#     nifti_data_type = dataset_name
-#     nifti_csv_col_name = "stroke_mri_sliced_caption"
-
-
 def save_mri_sliced_captions(loader, voxcap_dnn, dataset_name, stroke_vocab, folder="save_mri_sliced_captions"):
     # nifti_percent_slices_save = 0.025
     # nifti_filepath_df_row = 0
     nifti_seg_2d_slice_divisor = 2
     nifti_data_type = dataset_name
-    nifti_csv_col_name = "stroke_mri_sliced_caption"
+    nifti_csv_col_name = "stroke_mri_caption"
+    caption_name = "Medical History"
 
     with torch.no_grad():
         for index, (prep_voxel, voxel_captions) in enumerate(loader):
@@ -168,17 +194,37 @@ def save_mri_sliced_captions(loader, voxcap_dnn, dataset_name, stroke_vocab, fol
             prep_voxel = prep_voxel.to(device=DEVICE)
             voxel_captions = voxel_captions.to(device=DEVICE)
 
+            prep_voxel_np = prep_voxel.squeeze().cpu().numpy()
+
             # outputs = voxcap_dnn(prep_voxel, voxel_captions[:-1])
 
             image_caption_pred_list, image_caption_gt_list = voxcap_dnn.caption_image(prep_voxel, stroke_vocab, gt_caption=voxel_captions)
             image_caption_pred_str = " ".join(image_caption_pred_list)
             image_caption_gt_str = " ".join(image_caption_gt_list)
-            print(f"Ex {index} MRI Caption Pred: " + image_caption_pred_str + "; MRI Caption GT: " + image_caption_gt_str)
 
+            caption = f"MRI {index} Caption: Pred: {image_caption_pred_str}; GT: {image_caption_gt_str}"
+            print(caption)
 
+            # TODO (JG): Double check silent plot save, so it doesnt open up
+            slice_id = prep_voxel_np.shape[0]//nifti_seg_2d_slice_divisor
+            # fig, ax = plt.subplots(figsize=(14, 10))
+            fig, ax = plt.subplots()
+            ax.text(0.5, -0.1, caption, ha="center", va="center", transform=ax.transAxes)
+            ax.set_title("{}: {} Stroke MRI Caption of 2D Slice ID {} ".format(caption_name, nifti_data_type.upper(), slice_id))
+            ax.imshow(prep_voxel_np[slice_id])
+
+            saved_mri_cap_slice_dir = mkdir_prep_dir(folder)
+            output_filename = "{}_{}_slice_id_{}.{}".format(nifti_csv_col_name, index, slice_id, "jpg")
+            output_filepath = os.path.join(saved_mri_cap_slice_dir, output_filename)
+            plt.savefig(output_filepath)
+            plt.close()
+            print(f"Saved Stroke MRI Caption 2D Slice Viz: {saved_mri_cap_slice_dir}")
 
 def validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab):
     val_loop = tqdm(val_loader)
+
+    val_loss_values = []
+    val_bleu_scores = []
 
     print("Running validate_cnn3d_rnn")
     with torch.no_grad():
@@ -193,14 +239,19 @@ def validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab):
 
             loss = loss_criterion(outputs.reshape(-1, outputs.shape[2]), voxel_captions.reshape(-1))
             
+            val_bleu_score = calc_bleu_score(outputs.reshape(-1, outputs.shape[2]), voxel_captions.reshape(-1))
+
             # Save the validation loss values to list
-            val_ce_loss_values.append(loss.item())
+            val_loss_values.append(loss.item())
+
+            val_bleu_scores.append(val_bleu_score)
             
             val_loop.set_postfix(val_ce_loss=loss.item())
 
             # print_examples(voxcap_dnn, prep_voxel, DEVICE, stroke_vocab, batch_idx)
 
-
+    val_ce_loss_values.append(min(val_loss_values))
+    val_bleu_score_values.append(min(val_bleu_scores))
 
 def train_voxcap_over_epochs(voxcap_dnn, optimizer, loss_criterion, step, train_loader, val_loader, stroke_vocab, dataset_name="icpsr"):
     voxcap_dnn.train()
@@ -219,7 +270,7 @@ def train_voxcap_over_epochs(voxcap_dnn, optimizer, loss_criterion, step, train_
         filename="icpsr/models/cnn3d_rnn_voxcap_{}.pth.tar".format(step)
         save_checkpoint(checkpoint, filename=filename)
 
-        # validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab)
+        validate_cnn3d_rnn(val_loader, voxcap_dnn, loss_criterion, stroke_vocab)
 
 def qual_eval_voxcap(voxcap_dnn, step, val_loader, stroke_vocab, dataset_name="icpsr"):
     voxcap_dnn.eval()
@@ -227,10 +278,13 @@ def qual_eval_voxcap(voxcap_dnn, step, val_loader, stroke_vocab, dataset_name="i
     # for epoch in range(NUM_EPOCHS):
 
     model_filepath = "/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/image-caption/icpsr/models/cnn3d_rnn_voxcap_2041.pth.tar"
-        
-    load_checkpoint(torch.load(model_filepath), voxcap_dnn)
+    
+    if USE_PRETRAINED_MODEL:
+        load_checkpoint(torch.load(model_filepath), voxcap_dnn)
 
-    save_mri_sliced_captions(val_loader, voxcap_dnn, dataset_name, stroke_vocab, folder="{}/save_mri_sliced_captions/{}".format(dataset_name, step))
+    save_mri_sliced_captions(val_loader, voxcap_dnn, dataset_name, stroke_vocab, folder="{}/save_mri_sliced_captions/".format(dataset_name))
+    # NOTE (JG): If we used epochs here, step inc by 100
+    step += 100
 
 def plot_cnn3d_rnn_loss_curve(ce_loss_values, plot_title, plot_filename):
     plt.title(plot_title)
@@ -238,6 +292,15 @@ def plot_cnn3d_rnn_loss_curve(ce_loss_values, plot_title, plot_filename):
     plt.legend()
     plt.savefig(plot_filename)
     plt.show()
+
+def plot_cnn3d_rnn_bleu_score_curve(bleu_score_values, plot_title, plot_filename):
+    plt.title(plot_title)
+    plt.plot(bleu_score_values, label="BLEU Score")
+    plt.legend()
+    plt.savefig(plot_filename)
+    plt.show()
+
+
 
 def train_stroke_mri_captioning(nifti_csv_data, dataset_name="icpsr"):
     X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["voxid_to_prep_vox"].tolist(), nifti_csv_data["voxid_to_prep_caption"].tolist(), test_size=0.3)
@@ -293,13 +356,17 @@ def train_stroke_mri_captioning(nifti_csv_data, dataset_name="icpsr"):
     # if load_model:
     #     step = load_checkpoint(torch.load("cnn3d_rnn_voxcap_{}.pth.tar"), model, optimizer)
 
-    # train_voxcap_over_epochs(model, optimizer, criterion, step, train_loader, val_loader, stroke_vocab)
+    train_voxcap_over_epochs(model, optimizer, criterion, step, train_loader, val_loader, stroke_vocab)
 
-    qual_eval_voxcap(model, step, val_loader, stroke_vocab)
+    # qual_eval_voxcap(model, step, val_loader, stroke_vocab)
 
     mkdir_prep_dir("icpsr/models/loss_curves/")
     plot_cnn3d_rnn_loss_curve(train_ce_loss_values, "CNN3DToLSTM Train Loss Curve", "icpsr/models/loss_curves/cnn3d_to_lstm_train_loss_curve.jpg")
     plot_cnn3d_rnn_loss_curve(val_ce_loss_values,  "CNN3DToLSTM Valid Loss Curve", "icpsr/models/loss_curves/cnn3d_to_lstm_val_loss_curve.jpg")
+
+    mkdir_prep_dir("icpsr/models/bleu_score_curves/")
+    plot_cnn3d_rnn_bleu_score_curve(train_bleu_score_values, "CNN3DToLSTM Train BLEU Score Curve", "icpsr/models/bleu_score_curves/cnn3d_to_lstm_train_bleu_curve.jpg")
+    plot_cnn3d_rnn_bleu_score_curve(train_bleu_score_values, "CNN3DToLSTM Valid BLEU Score Curve", "icpsr/models/bleu_score_curves/cnn3d_to_lstm_val_bleu_curve.jpg")
 
 
 def main():
