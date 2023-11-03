@@ -39,7 +39,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 2
+# Took around 5 epochs to get Dice >= 0.25
+NUM_EPOCHS = 5
 DEBUG = False
 TRAINING_TASKNAME = "Stroke Lesion Segmentation"
 
@@ -243,7 +244,7 @@ def train_lesion_seg_over_epochs(unet3d_model, optimizer, bce_criterion, train_l
 
     unet3d_model.train()
     step = 0
-    for epoch in range(NUM_EPOCHS):
+    for epoch in range(1, NUM_EPOCHS+1):
         if DEBUG:
             print("Epoch {}: Train across batch_idx and brain_data and target from train_loader".format(NUM_EPOCHS))
         
