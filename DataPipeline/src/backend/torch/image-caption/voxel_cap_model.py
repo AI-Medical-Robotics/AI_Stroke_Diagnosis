@@ -203,7 +203,7 @@ class CNN3DtoRNN(nn.Module):
         outputs = self.decoderRNN(features, captions)
         return outputs
 
-    def caption_image(self, image, vocabulary, gt_caption=None, max_length=50):
+    def caption_image(self, image, vocabulary, gt_caption=None, max_length=50, keep_eos=True):
         result_caption = []
         image_caption_gt = []
 
@@ -221,13 +221,18 @@ class CNN3DtoRNN(nn.Module):
                 predicted = output.argmax(1)
                 # print(f"after argmax(1) pred = {predicted}")
 
-                if vocabulary.itos[predicted.item()] == "<EOS>":
-                    break
+                if not keep_eos:
+                    if vocabulary.itos[predicted.item()] == "<EOS>":
+                        break
 
                 result_caption.append(predicted.item())
                 x = self.decoderRNN.embed(predicted).unsqueeze(0)
                 # print(f"after decoderRNN embed: x.shape = {x.shape}")
         
+                if keep_eos:
+                    if vocabulary.itos[predicted.item()] == "<EOS>":
+                        break
+
         image_caption_pred = [vocabulary.itos[idx] for idx in result_caption]
         if gt_caption is None:
             return image_caption_pred
@@ -238,8 +243,9 @@ class CNN3DtoRNN(nn.Module):
         for gt_idx in gt_caption.tolist():
             # print(f"gt_idx[0] = {gt_idx[0]}")
             # print(f"vocabulary.itos[gt_idx[0]] = {vocabulary.itos[gt_idx[0]]}")
-            if vocabulary.itos[gt_idx[0]] == "<EOS>":
-                break
+            if not keep_eos:
+                if vocabulary.itos[gt_idx[0]] == "<EOS>":
+                    break
             image_caption_gt.append(vocabulary.itos[gt_idx[0]])
 
 
