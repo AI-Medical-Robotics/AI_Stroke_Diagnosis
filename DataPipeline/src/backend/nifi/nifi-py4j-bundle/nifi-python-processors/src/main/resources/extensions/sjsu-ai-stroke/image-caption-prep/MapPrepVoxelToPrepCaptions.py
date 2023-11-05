@@ -15,6 +15,7 @@
 
 import io
 import os
+import re
 import json
 import pandas as pd
 
@@ -30,7 +31,7 @@ class MapPrepVoxelToPrepCaptions(FlowFileTransform):
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', 'SimpleITK==2.2.1']
-        description = 'Gets Mapped 3D Voxel IDs to Captions pickle bytes filepaths and Mapped 3D Voxel IDs to Prepped Voxels pickle bytes filepaths from the incoming pandas csv dataframe in the flow file, loads these mappings from pickle bytes files, performs multiple preprocessing operations (lowercasing; removing digits, special chars, white space) on each voxel ID\'s captions string, returning back an updated map of voxel ID to prepped captions, and then maps prepped voxels to prepped captions by voxel ID, storing these mappings to pickle bytes files and has the filepaths saved in a new pd df'
+        description = 'Gets Mapped 3D Voxel IDs to Clinical Captions pickle bytes filepaths and Mapped 3D Voxel IDs to Prepped Voxels pickle bytes filepaths from the incoming pandas csv dataframe in the flow file, loads these mappings from pickle bytes files, performs multiple preprocessing operations (lowercasing; removing digits, special chars, white space) on each voxel ID\'s captions string, returning back an updated map of voxel ID to prepped captions, and then maps prepped voxels to prepped captions by voxel ID, storing these mappings to pickle bytes files and has the filepaths saved in a new pd df'
         tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'nifti']
 
     def __init__(self, **kwargs):
@@ -158,8 +159,13 @@ class MapPrepVoxelToPrepCaptions(FlowFileTransform):
 
                 self.logger.info("check2: voxid_to_caps len = {}".format(len(voxid_to_caps)))
 
+                # voxid_from_caps = list(voxid_to_caps.keys())[0]
+                # clinical_caption_list = list(voxid_to_caps.values())[0]
+                # clinical_label = clinical_caption_tuple[0]
+                # captions_str = clinical_caption_tuple[1]
+
                 voxid_from_caps = voxid_to_caps[0]
-                captions_str = voxid_to_caps[1]
+                clinical_caption_list = voxid_to_caps[1]
 
                 if voxid_from_caps in voxid_from_prepvox:
                     self.logger.info("Voxel ID from Prepped voxel matches Voxel ID from captions")
@@ -178,8 +184,10 @@ class MapPrepVoxelToPrepCaptions(FlowFileTransform):
                         self.logger.error("An error occurred while saving Prepped voxel with voxid_from_caps in filename!!!: {}".format(e))
 
 
-                    for cap_i in range(len(captions_str)):
-                        caption = captions_str[cap_i]
+                    for idx in range(len(clinical_caption_list)):
+                        clinical_caption_tuple = clinical_caption_list[idx]
+                        clinical_label = clinical_caption_tuple[0]
+                        caption = clinical_caption_tuple[1]
                         # Convert to lowercase
                         caption = caption.lower()
 
@@ -187,13 +195,15 @@ class MapPrepVoxelToPrepCaptions(FlowFileTransform):
                         caption = caption.replace(self.cap_del_regex_pattern, '')
 
                         # delete additional spaces
-                        caption = caption.replace('\s+', ' ')
+                        # caption = caption.replace('\s+', ' ')
+                        caption = re.sub('\s+', ' ', caption)
 
-                        voxid_to_prep_caption_set = (voxid_from_caps, caption)
+                        voxid_to_prep_caption_dict = {}
+                        voxid_to_prep_caption_dict[voxid_from_caps] = (clinical_label, caption)
 
-                        voxid_to_prep_caption_bytes = pickle.dumps(voxid_to_prep_caption_set)
+                        voxid_to_prep_caption_bytes = pickle.dumps(voxid_to_prep_caption_dict)
 
-                        output_voxid_prepcap_path = os.path.join(self.prep_captions_dirpath, self.data_name + "_" + str(i) + "_cap_" + str(cap_i) + ".pk1")
+                        output_voxid_prepcap_path = os.path.join(self.prep_captions_dirpath, self.data_name + "_" + str(i) + "clinical_cap_" + str(idx) + ".pk1")
                         self.logger.info("Mapped 3D Voxel IDs to Preprocessed Captions pickle output_path = {}".format(output_voxid_prepcap_path))
                         try:
                             with open(output_voxid_prepcap_path, "wb") as file:

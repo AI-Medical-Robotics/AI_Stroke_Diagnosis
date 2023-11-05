@@ -25,44 +25,44 @@ import pickle5 as pickle
 from nifiapi.properties import PropertyDescriptor, StandardValidators
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 
-class MapVoxelIDsToCaptions(FlowFileTransform):
+class MapVoxelIDsToClinicalCaptions(FlowFileTransform):
     class Java:
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
         dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', "torch", "torchvision", "torchaudio"]
-        description = 'Gets 3D voxel captions txt metadata, performs dictionary mapping voxel ID to voxel captions, saves each dictionary element as pickle bytes and stores filepath to pandas dataframe'
+        description = 'Gets 3D voxel captions txt metadata, performs dictionary mapping voxel ID to list of tuples clinical labels and captions, saves each dictionary element as pickle bytes and stores filepath to pandas dataframe'
         tags = ['sjsu_ms_ai', 'csv', 'nifti', 'pytorch']
 
     def __init__(self, **kwargs):
         # Build Property Descriptors
-        self.captions_source_path = PropertyDescriptor(name="Captions Source Path",
-            description="Captions Source Path where 3D voxel IDs to captions txt metadata is located",
+        self.captions_source_path = PropertyDescriptor(name="Clinical Captions Source Path",
+            description="Clinical Captions Source Path where 3D voxel IDs to captions txt metadata is located",
             validators=[StandardValidators.NON_EMPTY_VALIDATOR],
-            default_value="/media/bizon/ai_projects/data/ICPSR_38464_Stroke_Data_NiFi/annotations/partipant_id_captions.csv",
+            default_value="/media/bizon/projects_1/data/ICPSR_38464_Stroke_Data_NiFi/annotations/voxel_id_clinical_captions.csv",
             required=True
         )
         self.voxid_to_caption_dir = PropertyDescriptor(
             name = '3D Voxel ID Mappings to Captions Destination Path',
-            description = 'The folder to store the 3D voxel IDs mapped to captions',
-            default_value="/media/ubuntu/ai_projects/data/ICPSR_38464_Stroke_Data_NiFi/{}".format("map_voxids_to_captions"),
+            description = 'The folder to store the 3D voxel IDs mapped to tuple of clinical label and captions',
+            default_value="/media/bizon/projects_1/data/ICPSR_38464_Stroke_Data_NiFi/{}".format("map_voxids_to_clinical_captions"),
             required = True
         )
         self.target_colname_df = PropertyDescriptor(
             name = 'Target DataFrame Colname',
-            description = 'Specify the target column name for holding the destination paths of voxel id to caption mappings',
-            default_value="voxid_to_captions",
+            description = 'Specify the target column name for holding the destination paths of voxel id to clinical caption mappings',
+            default_value="voxid_to_clinical_captions",
             required = True
         )
         self.source_colname_df = PropertyDescriptor(
             name = 'Source Colname from Input Prepped DataFrame',
-            description = 'Specify the source column name for holding the incoming voxel IDs from voxel caption prepped df, so we filter only those voxel IDs in the voxel ID to captions mappings',
+            description = 'Specify the source column name for holding the incoming voxel IDs from voxel clinical caption prepped df, so we filter only those voxel IDs in the voxel ID to clinical captions mappings',
             default_value="brain_dwi_orig",
             required = True
         )
         self.already_prepped = PropertyDescriptor(
-            name = 'Already Mapped 3D Voxel IDs to Captions',
-            description = 'If 3D Voxel IDs Mapped to Captions Already Performed, then just get filepaths',
+            name = 'Already Mapped 3D Voxel IDs to Clinical Captions',
+            description = 'If 3D Voxel IDs Mapped to Clinical Captions Already Performed, then just get filepaths',
             default_value=False,
             required = False,
         )
@@ -120,14 +120,16 @@ class MapVoxelIDsToCaptions(FlowFileTransform):
         # else:
         self.logger.info("Doing the Mapped 3D Voxel IDs to Captions From Scratch")
 
-        if self.data_name == "flickr":
-            cap_features_imgid_labels = self.load_caption_data()
+        # if self.data_name == "flickr":
+        #     cap_features_imgid_labels = self.load_caption_data()
             # elif self.data_name == "atlas":
             #     input_image = sitk.ReadImage(vox_cap_csv_data.train_t1w_raw.iloc[i], sitk.sitkFloat32)
-        elif self.data_name == "icpsr_stroke":
+        if self.data_name == "icpsr_stroke":
             # imgid_cap_label_df = pd.read_csv(self.captions_source_filepath)
             cap_features_imgid_labels = self.load_caption_data()
 
+        # TODO (JG): 3 tokens: voxel_id, clinical_label, caption
+        # key value pair: voxel_id: [(clinical_label, caption)]
         voxid_to_captions_map = {}
         for caption_label in cap_features_imgid_labels.split("\n"):
 
@@ -135,14 +137,18 @@ class MapVoxelIDsToCaptions(FlowFileTransform):
             if len(caption_label) < 2:
                 continue
                 
-            voxel_id, captions = tokens[0], tokens[1:]
+            voxel_id, clinical_label, captions = tokens[0], tokens[1:2], tokens[2:]
             self.logger.info("voxel_id = {}".format(voxel_id))
+            self.logger.info("clinical_label = {}".format(clinical_label))
+            self.logger.info("captions = {}".format(captions))
             # voxel_id = voxel_id.split(".")[0]
+
+            label_str = " ".join(clinical_label)
 
             captions_str = " ".join(captions)
             if voxel_id not in voxid_to_captions_map:
                 voxid_to_captions_map[voxel_id] = list()
-            voxid_to_captions_map[voxel_id].append(captions_str)
+            voxid_to_captions_map[voxel_id].append( (label_str, captions_str) )
 
         # col_names = list(vox_cap_csv_data.columns).append(self.target_colname)
         col_names = list(vox_cap_csv_data.columns)
