@@ -23,9 +23,6 @@ from nifiapi.properties import PropertyDescriptor
 from nifiapi.flowfiletransform import FlowFileTransform, FlowFileTransformResult
 from py4j.java_collections import ListConverter
 
-# TODO (JG): Resize and Crop SimpleITK not working as expected like nilearn resample_img(), testing
-
-# TODO (JG): Make this work for training and testing sets
 class ResizeCropITKImage(FlowFileTransform):
     class Java:
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
@@ -107,12 +104,6 @@ class ResizeCropITKImage(FlowFileTransform):
         resampler.SetOutputOrigin(input_image.GetOrigin())
         # resampler.SetOutputDirection(new_affine.GetMatrix())
         resampler.SetOutputDirection(input_image.GetDirection())
-
-        # offset = (2, 2, 2)
-        # new_output_origin = tuple(new_affine.GetTranslation()) + offset
-        # resampler.SetOutputOrigin(sitk.VectorDouble(new_output_origin))
-
-        
         resampler.SetInterpolator(sitk.sitkNearestNeighbor)
         # resampler.SetTransform(new_affine)
         resampled_image = resampler.Execute(input_image)

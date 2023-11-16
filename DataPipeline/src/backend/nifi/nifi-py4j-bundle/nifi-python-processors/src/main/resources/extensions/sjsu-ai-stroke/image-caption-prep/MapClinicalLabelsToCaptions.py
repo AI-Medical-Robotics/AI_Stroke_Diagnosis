@@ -20,6 +20,7 @@ import pandas as pd
 
 import json
 from jsonpath_ng import parse
+# from nltk.corpus import wordnet
 
 import pickle5 as pickle
 
@@ -36,7 +37,7 @@ class MapClinicalLabelsToCaptions(FlowFileTransform):
         implements = ['org.apache.nifi.python.processor.FlowFileTransform']
     class ProcessorDetails:
         version = '0.0.1-SNAPSHOT'
-        dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', 'jsonpath_ng']
+        dependencies = ['pandas==1.3.5', 'pillow==10.0.0', 'pickle5==0.0.11', 'jsonpath_ng', 'nltk']
         description = 'Gets the clinical labels file of voxel IDs and clinical labels, then uses a medical dictionary to map clinical labels to short or long captions (ex: medical-history, lesion-type, etc), creates a new voxel ID to clinical labels to captions csv file, saves it to a new folder'
         tags = ['sjsu_ms_ai', 'csv', 'jpeg', 'nifti', 'jsonpath']
 
@@ -167,8 +168,20 @@ class MapClinicalLabelsToCaptions(FlowFileTransform):
 
                     voxel_id, label = tokens[0], tokens[1:]
                     label_str = " ".join(label)
+                    if len(voxel_id) == 0:
+                        self.logger.info(f"voxel_id is empty {voxel_id}, continuing to next iteration")
+                        continue
+                    elif len(label_str) == 0:
+                        self.logger.info(f"label_str is empty {label_str}, continuing to next iteration")
+                        continue
                     self.logger.info(f"Clinical Label: {label}")
                     self.logger.info(f"Clinical Label Str: {label_str}")
+
+                    label_str_len = len(label_str)
+                    label_substr_len = label_str_len // 2
+                    label_substr = label_str[:label_substr_len]
+                    # label_synsets = wordnet.synsets(label_str)
+                    # label_synonyms = [lemma.name() for synset in label_synsets for lemma in synset.lemmas()]
 
 
                     # self.logger.info(f"JSONPath Expression: {self.target_captions_base_json_path}.{label_str}")
@@ -178,14 +191,24 @@ class MapClinicalLabelsToCaptions(FlowFileTransform):
 
                     self.logger.info(f"JSON Index Tokens: {json_index_tokens}")
                     captions_dict = clinical_captions_dict[json_index_tokens[0]][json_index_tokens[1]]
-                    if label_str in captions_dict:
-                        self.logger.info(f"{label_str} is in captions_dict")
-                        target_caption = captions_dict[label_str]
-                        self.logger.info(f"Label: {label_str} => {target_caption}")
 
-                        writer.writerow([voxel_id, label_str, target_caption])
+                    for key in captions_dict.keys():
+                        if key.lower() == label_str.lower():
+                            self.logger.info(f"{label_str} is in captions_dict")
+                            target_caption = captions_dict[key]
+                            self.logger.info(f"Label: {label_str} => {target_caption}")
+
+                            writer.writerow([voxel_id, label_str, target_caption])
+                        
+                        elif label_substr in key.lower():
+                            self.logger.info(f"label substring {label_substr} is in target key {key.lower}")
+                            target_caption = captions_dict[key]
+                            writer.writerow([voxel_id, label_str, target_caption])
+                        # elif key.lower() in label_synonyms:
+                        #     self.logger.info(f"target {key} is in label_synonyms")
                     else:
                         self.logger.info(f"WARNING: key {label_str} didnt matched in captions_dict, ignoring")
+                        self.logger.info(f"WARNING: also captions_dict key didnt match a synonym of our key {label_str}")
                     # NOTE (JG): Trying to see if I can take substring of key to use to extract Dict key value, but for now ignore
                     # elif any(label_str in caption_key for caption_key in captions_dict):
                     #     self.logger.info(f"{label_str} substring is in captions_dict, trying JSONPath expression to get key's value from captions_dict")

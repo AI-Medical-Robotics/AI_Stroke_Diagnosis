@@ -165,7 +165,7 @@ class CreateVoxelIDClinicalLabels(FlowFileTransform):
                             self.logger.info("type = {}; clinical_label_str = {}".format(type(clinical_label_str), clinical_label_str))
 
                             if self.target_clinical_demarcator == "NA":
-                                writer.writerow([participant_id, clinical_label])
+                                writer.writerow([participant_id, clinical_label_str])
                             elif self.target_clinical_demarcator in clinical_label_str:
                                 clinical_label_list = clinical_label_str.split(self.target_clinical_demarcator)
 
