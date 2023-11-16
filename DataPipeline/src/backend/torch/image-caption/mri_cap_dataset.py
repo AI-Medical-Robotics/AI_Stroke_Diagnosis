@@ -58,6 +58,7 @@ class StrokeMRIVocabulary:
 
         for token in tokenized_text:
             if token in self.stoi:
+                # print(f"token = {token}")
                 numericalized_corpus.append(self.stoi[token])
             else:
                 numericalized_corpus.append(self.stoi["<UNK>"])
@@ -65,10 +66,11 @@ class StrokeMRIVocabulary:
         return numericalized_corpus
 
 class StrokeMRICapDataset(torch.utils.data.Dataset):
-    def __init__(self, voxid_to_prep_vox_list, voxid_to_cap_list, freq_threshold=5, debug=False):
+    def __init__(self, voxid_to_prep_vox_list, voxid_to_cap_list, freq_threshold=5, debug=False, caption_type="short_caption"):
         self.voxid_to_prep_vox_paths_ = voxid_to_prep_vox_list
         self.voxid_to_cap_paths_ = voxid_to_cap_list
         self.debug = debug
+        self.caption_type = caption_type
         # self.tokenizer = get_tokenizer("basic_english")
         # self.torch_vocab = self.build_vocabulary()
         self.all_captions = self.get_all_captions()
@@ -84,15 +86,20 @@ class StrokeMRICapDataset(torch.utils.data.Dataset):
             with open(self.voxid_to_cap_paths_[i], "rb") as file:
                 voxid_to_prep_caps = pickle.load(file)
 
-                voxel_id = voxid_to_prep_caps[0]
-                prep_captions_str = voxid_to_prep_caps[1]
-                # voxel_id = list(voxid_to_prep_caps.keys())[0]
-                # prep_captions_str = list(voxid_to_prep_caps.values())[0]
+                # voxel_id = voxid_to_prep_caps[0]
+                # prep_clinical_captions_list = voxid_to_prep_caps[1]
 
-                # voxid_cap_map[voxel_id] = prep_captions_str
+                voxel_id = list(voxid_to_prep_caps.keys())[0]
+                prep_clinical_captions_list = list(voxid_to_prep_caps.values())[0]
 
-                # if i == 0:
-                #     print(f"prep_captions_str = {prep_captions_str}")
+                if self.caption_type == "short_caption":
+                    clinical_label = prep_clinical_captions_list[0]
+                    # print(f"short caption: clinical_label = {clinical_label}")
+                    prep_captions_str = clinical_label
+                elif self.caption_type == "long_caption":
+                    caption = prep_clinical_captions_list[1]
+                    # print(f"long caption: caption = {caption}")
+                    prep_captions_str = caption
 
                 # for caption in prep_captions_str:
                 if i == 0:
@@ -103,26 +110,7 @@ class StrokeMRICapDataset(torch.utils.data.Dataset):
         # print(f"captions_tokens_corpus = {captions_tokens_corpus}")
         return captions_tokens_corpus
 
-    # def build_vocabulary(self):
-    #     captions_tokens_corpus = self.get_all_captions()
 
-    #     # print(f"captions_tokens_corpus = {captions_tokens_corpus}")
-
-    #     vocab = build_vocab_from_iterator(captions_tokens_corpus, specials=["<unk>"], special_first=True)
-
-    #     return vocab
-
-    # def numericalize_captions(self, all_captions_per_voxel):
-    #     print(f"all_captions_per_voxel = {all_captions_per_voxel}")
-    #     # tokenize 
-    #     # tokens_corpus = [sentence.split() for sentence in all_captions_per_voxel]
-    #     # print(f"tokens_corpus = {tokens_corpus}")
-
-    #     # Convert the tokenized corpus to numerical data
-    #     numerical_corpus = [[self.torch_vocab[token] for token in sentence] for sentence in all_captions_per_voxel]
-
-    #     # print(f"numerical_corpus = {numerical_corpus}")
-    #     return numerical_corpus
 
     def __len__(self):
         return len(self.voxid_to_prep_vox_paths_)
@@ -155,8 +143,22 @@ class StrokeMRICapDataset(torch.utils.data.Dataset):
         with open(self.voxid_to_cap_paths_[idx], "rb") as file:
             pickle_voxid_to_prepcaps = pickle.load(file)
 
-        voxel_id_from_caps = pickle_voxid_to_prepcaps[0]
-        prep_captions_str = pickle_voxid_to_prepcaps[1]
+        # print(f"Trying to get voxel ID and clinical caption from tuple")
+        # voxel_id_from_caps = pickle_voxid_to_prepcaps[0]
+        # prep_captions_str = pickle_voxid_to_prepcaps[1]
+
+        # print(f"Trying to get voxel ID and clinical caption from dictionary")
+        voxel_id_from_caps = list(pickle_voxid_to_prepcaps.keys())[0]
+        prep_clinical_captions_list = list(pickle_voxid_to_prepcaps.values())[0]
+
+        if self.caption_type == "short_caption":
+            clinical_label = prep_clinical_captions_list[0]
+            # print(f"short caption: clinical_label = {clinical_label}")
+            prep_captions_str = clinical_label
+        elif self.caption_type == "long_caption":
+            caption = prep_clinical_captions_list[1]
+            # print(f"long caption: caption = {caption}")
+            prep_captions_str = caption
 
         # voxel_id_from_caps = list(pickle_voxid_to_prepcaps.keys())[0]
         # TODO (JG): numericalize captions
