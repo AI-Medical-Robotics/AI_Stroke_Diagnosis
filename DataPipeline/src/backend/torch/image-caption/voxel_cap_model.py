@@ -190,15 +190,15 @@ class DecoderRNN(nn.Module):
         outputs = self.linear(hiddens)
         return outputs
 
-class CNN3DtoRNN(nn.Module):
+class CNN3DtoLSTM(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
-        super(CNN3DtoRNN, self).__init__()
+        super(CNN3DtoLSTM, self).__init__()
         self.encoderCNN3D = EncoderCNN3D(embed_size, hidden_size)
         self.decoderRNN = DecoderRNN(embed_size, hidden_size, vocab_size, num_layers)
 
     def forward(self, images, captions):
-        # print("CNN3DtoRNN: images.shape = {}".format(images.shape))
-        # print("CNN3DtoRNN: captions.shape = {}".format(captions.shape))
+        # print("CNN3DtoLSTM: images.shape = {}".format(images.shape))
+        # print("CNN3DtoLSTM: captions.shape = {}".format(captions.shape))
         features = self.encoderCNN3D(images)
         outputs = self.decoderRNN(features, captions)
         return outputs
@@ -215,7 +215,6 @@ class CNN3DtoRNN(nn.Module):
             for _ in range(max_length):
                 hiddens, states = self.decoderRNN.lstm(x, states)
                 # print(f"after decoderRNN: hiddens.shape = {hiddens.shape}")
-                # print(f"after decoderRNN: states = {states}")
                 output = self.decoderRNN.linear(hiddens.squeeze(0))
                 # print(f"after decoderRNN linear: output.shape = {output.shape}")
                 predicted = output.argmax(1)
