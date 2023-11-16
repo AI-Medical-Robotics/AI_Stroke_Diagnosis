@@ -39,7 +39,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 BATCH_SIZE = 2
 VAL_BATCH_SIZE = 1
 LOAD_MODEL = False
-NUM_EPOCHS = 6
+NUM_EPOCHS = 4
 DEBUG = False
 
 
@@ -370,6 +370,8 @@ def qual_eval_skull_strip_seg(unet3d_model, val_loader, dataset_name, model_file
     
     if USE_PRETRAINED_MODEL:
         load_checkpoint(torch.load(model_filepath), unet3d_model)
+    elif model_filepath is None:
+        print("model_filepath not provided, using trained model in qualitative evaluation")
 
     save_mri_skull_strip_seg_slices(val_loader, unet3d_model, dataset_name, folder=dst_folder)
 
@@ -591,6 +593,7 @@ def train_skull_strip_segmentation(nifti_csv_data, dataset_name="icpsr"):
 
     if not USE_PRETRAINED_MODEL:
         step = train_skull_strip_seg_over_epochs(unet3d_model, optimizer, bce_criterion, train_loader, val_loader, dataset_name, dst_folder=f"{dataset_name}/models/{MODEL_NAME.lower()}/saved_weights/")
+        model_filepath = None
     else:
         timestamp = time.time()
         step = f"pretrained_{timestamp}"
