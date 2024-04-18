@@ -2,6 +2,12 @@
 
 SJSU Master Thesis on Deep Learning in AI Medical Imaging for Stroke Diagnosis
 
+## Publications
+
+Check out my publication on AI Stroke Diagnosis:
+
+- SJSU ScholarWorks Fall 2023: ["Deep Learning in AI Medical Imaging for Stroke Diagnosis"](https://scholarworks.sjsu.edu/etd_theses/5445/), Author: James Guzman, Advisor: Dr. Eirinaki
+
 ## Objective
 
 - Use Apache NiFi and create multiple custom Python Processors to handle data preprocessing for skull stripping segmentation, stroke lesion segmentation and image captioning. My goal here is to make it easier to transition between preprocessing the different datasets we have been working with since we didn't have access to the ICPSR 38464 sroke dataset for a long time, but I think it is important to compare how our Deep Learning models learn from the preprocessed data from the different datasets.
