@@ -20,11 +20,11 @@ NiFi Data Preparation Pipeline for Eventually Training a Skull Stripping Segment
 
 NiFi Data Preparation Pipeline for Eventually Training a Image Captioning model (Flickr supported, ICPSR in progress)
 
-![NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png](NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png)
+![NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png](images/NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png)
 
 - **Figure 2:** NiFi Data Prep for Image Captioning Applied to Flickr
 
-![NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png](NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png)
+![NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png](images/NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png)
 
 - **Figure 2:** NiFi Data Prep for Image Captioning Appling to ICPSR 38464
 
