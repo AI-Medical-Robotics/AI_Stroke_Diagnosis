@@ -25,7 +25,7 @@ import torchmetrics
 from torchmetrics import Accuracy
 from focal_loss.focal_loss import FocalLoss
 
-from torch_model import SimpleUNet3D, AttSEUNet3D
+from torch_model import SimpleUNet3D, AttSEUNet3D, AttSESeLUUNet3D
 from brain_dataset import StrokeMRIDataset
 
 # Reference perplexity.ai for pytorch 3D UNet skull strip seg model
@@ -46,9 +46,16 @@ NUM_EPOCHS = 6
 DEBUG = False
 TRAINING_TASKNAME = "Stroke Lesion Segmentation"
 
+# Any metrics that require Max, Min will require being trained
 USE_PRETRAINED_MODEL=False
 
-MODEL_NAME = "Att_UNet3D"
+# MODEL_NAME = "Att_UNet3D"
+
+MODEL_NAME = "AttUNet3Dv2"
+
+# stroke_type = "ischemic"
+# stroke_type = "hemorrhagic"
+stroke_type = "both"
 
 # Average Loss values Per Epoch for loss curve
 train_bce_loss_avg_values = []
@@ -381,6 +388,9 @@ def qual_eval_lesion_seg(unet3d_model, val_loader, dataset_name, model_filepath,
     
     if USE_PRETRAINED_MODEL:
         load_checkpoint(torch.load(model_filepath), unet3d_model)
+    elif model_filepath is None:
+        print("model_filepath not provided, using trained model in qualitative evaluation")
+
 
     save_mri_lesion_seg_slices(val_loader, unet3d_model, dataset_name, folder=dst_folder)
 
@@ -554,47 +564,47 @@ def save_metric_scores_to_pd_csv(filepath, column_name, metric_score_values):
 
 def save_visualized_stroke_lesion_avg_metrics(unet3d_model, val_loader, dataset_name, step):
 
-    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/")
-    plot_unet3d_loss_curve(train_bce_loss_avg_values, f"{MODEL_NAME} Train Avg Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_avg_loss_curve.jpg")
-    plot_unet3d_loss_curve(val_bce_loss_avg_values,  f"{MODEL_NAME} Valid Avg Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_val_avg_loss_curve.jpg")
-    plot_unet3d_2_loss_curves(train_bce_loss_avg_values, val_bce_loss_avg_values, f"{MODEL_NAME} Avg Loss Curves", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_val_avg_loss_curves.jpg")
+    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/")
+    plot_unet3d_loss_curve(train_bce_loss_avg_values, f"{MODEL_NAME} Train Avg Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_avg_loss_curve.jpg")
+    plot_unet3d_loss_curve(val_bce_loss_avg_values,  f"{MODEL_NAME} Valid Avg Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_val_avg_loss_curve.jpg")
+    plot_unet3d_2_loss_curves(train_bce_loss_avg_values, val_bce_loss_avg_values, f"{MODEL_NAME} Avg Loss Curves", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_val_avg_loss_curves.jpg")
     
-    save_loss_values_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_val_loss_avg_values.csv", "train_avg_bce_loss", "val_avg_bce_loss", train_bce_loss_avg_values, val_bce_loss_avg_values)
+    save_loss_values_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_val_loss_avg_values.csv", "train_avg_bce_loss", "val_avg_bce_loss", train_bce_loss_avg_values, val_bce_loss_avg_values)
 
-    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/iou_score_curves/")
-    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/dice_score_curves/")
-    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_score_curves/")
+    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/iou_score_curves/")
+    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/dice_score_curves/")
+    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_score_curves/")
 
 
-    plot_unet3d_metric_score_curve("Valid IoU", val_iou_avg_values, f"{MODEL_NAME} Valid Avg IoU Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/iou_score_curves/{MODEL_NAME.lower()}_val_avg_iou_curve.jpg")
-    plot_unet3d_metric_score_curve("Valid Dice", val_dice_avg_values, f"{MODEL_NAME} Valid Avg Dice Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/dice_score_curves/{MODEL_NAME.lower()}_val_avg_dice_curve.jpg")
+    plot_unet3d_metric_score_curve("Valid IoU", val_iou_avg_values, f"{MODEL_NAME} Valid Avg IoU Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/iou_score_curves/{MODEL_NAME.lower()}_val_avg_iou_curve.jpg")
+    plot_unet3d_metric_score_curve("Valid Dice", val_dice_avg_values, f"{MODEL_NAME} Valid Avg Dice Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/dice_score_curves/{MODEL_NAME.lower()}_val_avg_dice_curve.jpg")
 
-    plot_unet3d_2_seg_metric_curves(val_iou_avg_values, val_dice_avg_values, f"{MODEL_NAME} Valid Avg IoU & Dice Score Curves", f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_avg_iou_dice_curves.jpg")
+    plot_unet3d_2_seg_metric_curves(val_iou_avg_values, val_dice_avg_values, f"{MODEL_NAME} Valid Avg IoU & Dice Score Curves", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_avg_iou_dice_curves.jpg")
 
-    save_2_metrics_scores_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_avg_iou_dice_scores.csv", "val_avg_iou_scores", "val_avg_dice_scores", val_iou_avg_values, val_dice_avg_values)
+    save_2_metrics_scores_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_avg_iou_dice_scores.csv", "val_avg_iou_scores", "val_avg_dice_scores", val_iou_avg_values, val_dice_avg_values)
 
-    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_tables/")
+    mkdir_prep_dir(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_tables/")
 
     # Table for Average BCE Loss, IoU, Dice
-    plot_unet3d_metrics_table(val_bce_loss_avg_values, val_iou_avg_values, val_dice_avg_values, f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_tables/{MODEL_NAME.lower()}_val_avg_dice_iou_bceloss.jpg", plot_title = f"{MODEL_NAME} Valid Avg Loss, IoU & Dice Score Metrics", col_prefix = ["Avg"], epoch_steps=step)
+    plot_unet3d_metrics_table(val_bce_loss_avg_values, val_iou_avg_values, val_dice_avg_values, f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_tables/{MODEL_NAME.lower()}_val_avg_dice_iou_bceloss.jpg", plot_title = f"{MODEL_NAME} Valid Avg Loss, IoU & Dice Score Metrics", col_prefix = ["Avg"], epoch_steps=step)
 
 
 def save_visualized_stroke_lesion_best_metrics(unet3d_model, val_loader, dataset_name, step):
-    plot_unet3d_loss_curve(train_bce_loss_min_values, f"{MODEL_NAME} Train Min Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_min_loss_curve.jpg")
-    plot_unet3d_loss_curve(val_bce_loss_min_values,  f"{MODEL_NAME} Valid Min Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_val_min_loss_curve.jpg")
-    plot_unet3d_2_loss_curves(train_bce_loss_min_values, val_bce_loss_min_values, f"{MODEL_NAME} Min Loss Curves", f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_val_min_loss_curves.jpg")
+    plot_unet3d_loss_curve(train_bce_loss_min_values, f"{MODEL_NAME} Train Min Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_min_loss_curve.jpg")
+    plot_unet3d_loss_curve(val_bce_loss_min_values,  f"{MODEL_NAME} Valid Min Loss Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_val_min_loss_curve.jpg")
+    plot_unet3d_2_loss_curves(train_bce_loss_min_values, val_bce_loss_min_values, f"{MODEL_NAME} Min Loss Curves", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_val_min_loss_curves.jpg")
     
-    save_loss_values_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/loss_curves/{MODEL_NAME.lower()}_train_val_loss_min_values.csv", "train_min_bce_loss", "val_min_bce_loss", train_bce_loss_min_values, val_bce_loss_min_values)
+    save_loss_values_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/loss_curves/{MODEL_NAME.lower()}_train_val_loss_min_values.csv", "train_min_bce_loss", "val_min_bce_loss", train_bce_loss_min_values, val_bce_loss_min_values)
 
-    plot_unet3d_metric_score_curve("Valid IoU", val_iou_max_values, f"{MODEL_NAME} Valid Max IoU Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/iou_score_curves/{MODEL_NAME.lower()}_val_max_iou_curve.jpg")
-    plot_unet3d_metric_score_curve("Valid Dice", val_dice_max_values, f"{MODEL_NAME} Valid Max Dice Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/dice_score_curves/{MODEL_NAME.lower()}_val_max_dice_curve.jpg")
+    plot_unet3d_metric_score_curve("Valid IoU", val_iou_max_values, f"{MODEL_NAME} Valid Max IoU Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/iou_score_curves/{MODEL_NAME.lower()}_val_max_iou_curve.jpg")
+    plot_unet3d_metric_score_curve("Valid Dice", val_dice_max_values, f"{MODEL_NAME} Valid Max Dice Score Curve", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/dice_score_curves/{MODEL_NAME.lower()}_val_max_dice_curve.jpg")
 
-    plot_unet3d_2_seg_metric_curves(val_iou_max_values, val_dice_max_values, f"{MODEL_NAME} Valid Max IoU & Dice Score Curves", f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_max_iou_dice_curves.jpg")
+    plot_unet3d_2_seg_metric_curves(val_iou_max_values, val_dice_max_values, f"{MODEL_NAME} Valid Max IoU & Dice Score Curves", f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_max_iou_dice_curves.jpg")
 
-    save_2_metrics_scores_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_max_iou_dice_scores.csv", "val_max_iou_scores", "val_max_dice_scores", val_iou_max_values, val_dice_max_values)
+    save_2_metrics_scores_to_pd_csv(f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_score_curves/{MODEL_NAME.lower()}_val_max_iou_dice_scores.csv", "val_max_iou_scores", "val_max_dice_scores", val_iou_max_values, val_dice_max_values)
 
     # Table for Best BCE Loss, IoU, Dice
-    plot_unet3d_metrics_table(val_bce_loss_min_values, val_iou_max_values, val_dice_max_values, f"icpsr/models/{MODEL_NAME.lower()}/seg_metric_tables/{MODEL_NAME.lower()}_val_best_dice_iou_bceloss.jpg", plot_title = f"{MODEL_NAME} Valid Min Loss, Max IoU & Dice Score Metrics", col_prefix = ["Min", "Max"], epoch_steps=step)
+    plot_unet3d_metrics_table(val_bce_loss_min_values, val_iou_max_values, val_dice_max_values, f"icpsr/models/{MODEL_NAME.lower()}/{stroke_type}/seg_metric_tables/{MODEL_NAME.lower()}_val_best_dice_iou_bceloss.jpg", plot_title = f"{MODEL_NAME} Valid Min Loss, Max IoU & Dice Score Metrics", col_prefix = ["Min", "Max"], epoch_steps=step)
 
 
 
@@ -602,7 +612,10 @@ def train_stroke_lesion_segmentation(nifti_csv_data, dataset_name="icpsr"):
     # TODO (JG): Check if I need to do preprocessing on "stroke_dwi_mask", I think we did this for "mask_index"
     # stroke_dwi_mask. Updated NiFi ResizeCropITKImage Py Processor and ExecuteDNNSkullStrippingSegmentation Processor
     # X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["skull_strip_seg"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.1)
-    X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.3)
+    if stroke_type == "both":
+        X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["intensity_norm"].tolist(), nifti_csv_data["stroke_mask_index"].tolist(), test_size=0.3)
+    elif stroke_type == "ischemic" or stroke_type == "hemorrhagic":
+        X_train, X_val, y_train, y_val = train_test_split(nifti_csv_data["voxid_to_prep_vox"].tolist(), nifti_csv_data["voxid_to_clinical_lesions"].tolist(), test_size=0.3)
 
     if DEBUG:
         print("X_train len = {}".format(len(X_train)))
@@ -610,8 +623,12 @@ def train_stroke_lesion_segmentation(nifti_csv_data, dataset_name="icpsr"):
 
     print("Creating stroke train & val datasets")
     
-    brain_train_dataset = StrokeMRIDataset(X_train, y_train)
-    brain_val_dataset = StrokeMRIDataset(X_val, y_val)
+    if stroke_type == "both":
+        brain_train_dataset = StrokeMRIDataset(X_train, y_train)
+        brain_val_dataset = StrokeMRIDataset(X_val, y_val)
+    elif stroke_type == "ischemic" or stroke_type == "hemorrhagic":
+        brain_train_dataset = StrokeMRIDataset(X_train, y_train, stroke_type)
+        brain_val_dataset = StrokeMRIDataset(X_val, y_val, stroke_type)
 
     if DEBUG:
         print("brain_train_dataset len = {}".format(len(brain_train_dataset)))
@@ -628,7 +645,12 @@ def train_stroke_lesion_segmentation(nifti_csv_data, dataset_name="icpsr"):
     # in_channels=1 for 1 medical image modality T2-weighted; out_channels=1 for skull vs non-skull
     # unet3d_model = SimpleUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
 
-    unet3d_model = AttSEUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
+    if MODEL_NAME == "Att_UNet3D":
+        unet3d_model = AttSEUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
+        print(f"Using {MODEL_NAME}: AttSEUNet3D")
+    elif MODEL_NAME == "AttUNet3Dv2":
+        unet3d_model = AttSESeLUUNet3D(in_channels=1, out_channels=1).to(device=DEVICE)
+        print(f"Using {MODEL_NAME}: AttSESeLUUNet3D")
 
     print("Compiling UNet3D with Adam, BCEWithLogitsLoss, Dice Score, Accuracy")
 
@@ -654,19 +676,20 @@ def train_stroke_lesion_segmentation(nifti_csv_data, dataset_name="icpsr"):
     # best_val_loss = float("inf")
     # best_val_iou = float("-inf")
 
-    mkdir_prep_dir(f"{dataset_name}/models/{MODEL_NAME.lower()}/saved_weights")
+    mkdir_prep_dir(f"{dataset_name}/models/{MODEL_NAME.lower()}/{stroke_type}/saved_weights")
 
     if not USE_PRETRAINED_MODEL:
-        step = train_lesion_seg_over_epochs(unet3d_model, optimizer, bce_criterion, train_loader, val_loader, dataset_name, dst_folder=f"{dataset_name}/models/{MODEL_NAME.lower()}/saved_weights/")
+        step = train_lesion_seg_over_epochs(unet3d_model, optimizer, bce_criterion, train_loader, val_loader, dataset_name, dst_folder=f"{dataset_name}/models/{MODEL_NAME.lower()}/{stroke_type}/saved_weights/")
+        model_filepath = None
     else:
         timestamp = time.time()
         step = f"pretrained_{timestamp}"
 
-        model_filepath = "/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/stroke-lesion-seg/icpsr/models/unet3d_bk110323/att_seunet3d_weights_5epochs/unet3d_stroke_lesion_seg_500.pth.tar"
+        model_filepath = "/home/bizon/src/AI_Stroke_Diagnosis/DataPipeline/src/backend/torch/stroke-lesion-seg/icpsr/models/att_unet3d_best_model_metrics_thesis/saved_weights/unet3d_stroke_lesion_seg_5076.pth.tar"
     
-    mkdir_prep_dir("{}/models/{}/saved_seg_slices/{}".format(dataset_name, MODEL_NAME.lower(), step))
+    mkdir_prep_dir(f"{dataset_name}/models/{MODEL_NAME.lower()}/{stroke_type}/saved_seg_slices/{step}")
 
-    qual_eval_lesion_seg(unet3d_model, val_loader, dataset_name, model_filepath, dst_folder="{}/models/{}/saved_seg_slices/{}".format(dataset_name, MODEL_NAME.lower(), step))
+    qual_eval_lesion_seg(unet3d_model, val_loader, dataset_name, model_filepath, dst_folder=f"{dataset_name}/models/{MODEL_NAME.lower()}/{stroke_type}/saved_seg_slices/{step}")
 
     
     save_visualized_stroke_lesion_avg_metrics(unet3d_model, val_loader, dataset_name, step)
