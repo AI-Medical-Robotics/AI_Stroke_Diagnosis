@@ -22,32 +22,20 @@ NiFi Data Preparation Pipeline for Eventually Training a Skull Stripping Segment
 
 ![NiFi_ICPSR_DataPrep_SkullStripSeg_Pipeline.png](images/NiFi_ICPSR_DataPrep_SkullStripSeg_Pipeline.png)
 
-- **Figure 1:** NiFi Data Prep for Skull Stripping Segmentation Applied to ICPSR 38464
+- **Figure 1:** NiFi Data Prep for Skull Stripping Segmentation & Stroke Lesion Segmentation Applied to ICPSR 38464, ATLAS, etc
 
 NiFi Data Preparation Pipeline for Eventually Training a Image Captioning model (Flickr supported, ICPSR in progress)
 
 ![NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png](images/NiFi_Flickr_DataPrep_ImageCaption_Pipeline.png)
 
-- **Figure 2:** NiFi Data Prep for Image Captioning Applied to Flickr
+- **Figure 2:** NiFi Data Prep for Image Captioning Applied to Flickr, ICPSR 38464
 
-![NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png](images/NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png)
+<!-- TODO (JG): Update the ICPSR Image Caption Data Pipeline -->
 
-- **Figure 2:** NiFi Data Prep for Image Captioning Appling to ICPSR 38464
+<!-- ![NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png](images/NiFi_ICPSR_DataPrep_ImageCaption_Pipeline_Progress.png)
 
-NiFi Data Preparation Pipeline for Eventually Training a Stroke Lesion Segmentation model (ICPSR in progress, ATLAS in progress)
+- **Figure 3:** NiFi Data Prep for Image Captioning Appling to ICPSR 38464 -->
 
-
-Coming soon...
-
-
-Here is my plan:
-
-- Client - Publisher: Simulate Stroke MRI Scanner in Unity where we load the MRI images while running the scanner simulator and then send those images over Zmq using C# Zmq Publisher.
-    - First work on a simple Python Zmq publisher to send stroke MRIs to 3D Slicer
-    - Second convert Python Zmq publisher to C++.
-
-- Server - Subscriber: "This an AI Stroke Diagnosis 3D Slicer extension using SuperBuild to build a project comprised of multiple modules that doctors and radiologists can leverage to load stroke data over Zmq using Python/C++ Zmq Subscriber, display stroke data dasbhoard analytics with ITK/VTK, display stroke lesion segmentation performed with PyTorch/CUDA's custom UNet model and display stroke medical image captioning performed with PyTorch/CUDA's custom CapGAN (or Transformer, LLM) model."
-    - Initially work on simple Python Zmq subscriber in 3D Slicer custom extension.
 
 ## Contributors
 
